@@ -1,0 +1,54 @@
+language: c
+# Run builds with 2 different values of the `nim_branch` environment variable
+env:
+  - nim_branch=master
+  - nim_branch=devel
+# Run builds with 2 different choices of a C compiler
+compiler:
+  - gcc
+  - clang
+# This meams we get a 2x2 build matrix, with a total of 4 builds
+matrix:
+  # It's OK if our project fails to build with Nim devel, but we still want to check it
+  allow_failures:
+    - env: nim_branch=devel
+  # Call the commit successful as soon as the builds with master branch complete.
+  fast_finish: true
+install:
+  - |
+    # Simply replacing "master" with `$nim_branch` everywhere means we can reuse
+    # this installation script for both branches.
+    if [ ! -x nim-$nim_branch/bin/nim ]; then
+      git clone -b $nim_branch --depth 1 git://github.com/nim-lang/nim nim-$nim_branch/
+      cd nim-$nim_branch
+      git clone -b $nim_branch --depth 1 git://github.com/nim-lang/csources csources/
+      cd csources
+      sh build.sh
+      cd ..
+      rm -rf csources
+      bin/nim c koch
+      ./koch boot -d:release
+    else
+      cd nim-$nim_branch
+      git fetch origin
+      if ! git merge FETCH_HEAD | grep "Already up-to-date"; then
+        bin/nim c koch
+        ./koch boot -d:release
+      fi
+    fi
+    cd ..
+before_script:
+  # `$nim_branch` is used here as well, to add the specific compiler to PATH
+  - export PATH="nim-$nim_branch/bin${PATH:+:$PATH}"
+script:
+  # Specify the C compiler to Nim
+  # (the `compiler` option of the build matrix sets the `$CC` variable)
+  - nim compile --cc:$CC --verbosity:0 --run tests/main
+cache:
+  # Cache both compilers easily
+  directories:
+    - nim-master
+    - nim-devel
+branches:
+  except:
+    - gh-pages

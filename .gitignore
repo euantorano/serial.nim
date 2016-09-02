@@ -1,8 +1,10 @@
-nimcache/
+nimcache
+tests/*
 !tests/*.nim
 !tests/nim.cfg
-tests/*
 nimsuggest.log
+
+.vscode
 
 ## Mac stuff
 
