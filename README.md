@@ -1,3 +1,3 @@
-# nim-project-template
+# serialport.nim
 
-A template for personal Nim projects.
+A library to work with serial ports using pure Nim.
