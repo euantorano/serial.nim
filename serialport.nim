@@ -1,5 +1,8 @@
 ## A library to work with serial ports using pure Nim.
 
+when defined(windows):
+  import winlean
+
 type
   Parity* {.pure.} = enum
     ## Allowable parities for the serial port.
@@ -31,21 +34,21 @@ type
     ## The standard length of data bits per byte for the serial port.
     five = 5,
     six = 6,
-    seven = 7
+    seven = 7,
     eight = 8
 
   StopBits* {.pure.} = enum
     ## The standard number of stopbits per byte for the serial port.
-    none = 0,
-    one = 1,
-    onePointFive = 1.5,
-    two = 2
+    none,
+    one,
+    onePointFive,
+    two
 
   SerialPortObj = object
     ## Represents a serial port.
-    name: string,
-    readTimeout: int,
-    writeTimeout: int,
+    name: string
+    readTimeout: int
+    writeTimeout: int
 
     when defined(windows):
       handle: Handle
@@ -57,7 +60,7 @@ type
 
 const
   defaultParity: Parity = Parity.none
-  defaultBaudRate: BaudRate = BD9600
+  defaultBaudRate: BaudRate = BR9600
   defaultDataBits: DataBits = DataBits.eight
   defaultStopBits: StopBits = StopBits.none
 

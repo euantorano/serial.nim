@@ -7,5 +7,5 @@ license       = "BSD3"
 
 # Dependencies
 
-requires "nim >= 0.14.2"
+requires "nim >= 0.15.2"
 

@@ -2,6 +2,9 @@ nimcache
 tests/*
 !tests/*.nim
 !tests/nim.cfg
+examples/*
+!examples/*.nim
+!examples/*.cfg
 nimsuggest.log
 
 .vscode
