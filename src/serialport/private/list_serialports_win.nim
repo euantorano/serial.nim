@@ -1,4 +1,4 @@
-{.deadCodeElim:on.}
+## Windows specific code to list available serial ports using SetupDiGetClassDevs().
 
 import winlean, os, registry
 
@@ -47,26 +47,27 @@ iterator listSerialPorts*(): string {.raises:[OSError].} =
   if devInfoSet[] == -1:
     raiseOsError(osLastError())
 
-  var
-    moreItems: bool = true
-    index: DWORD = 0
-    devInfo: SP_DEVINFO_DATA
+  try:
+    var
+      moreItems: bool = true
+      index: DWORD = 0
+      devInfo: SP_DEVINFO_DATA
 
-  ## Then enumerate the entries in the device info set
-  while moreItems:
-    devInfo.cbSize = DWORD(sizeof(SP_DEVINFO_DATA))
-    moreItems = SetupDiEnumDeviceInfo(devInfoSet, index, addr devInfo)
+    ## Then enumerate the entries in the device info set
+    while moreItems:
+      devInfo.cbSize = DWORD(sizeof(SP_DEVINFO_DATA))
+      moreItems = SetupDiEnumDeviceInfo(devInfoSet, index, addr devInfo)
 
-    if moreItems:
-      # Open the registry key for the device
-      let regKey: HKEY = SetupDiOpenDevRegKey(devInfoSet, addr devInfo, DICS_FLAG_GLOBAL, 0, DIREG_DEV, KEY_QUERY_VALUE)
+      if moreItems:
+        # Open the registry key for the device
+        let regKey: HKEY = SetupDiOpenDevRegKey(devInfoSet, addr devInfo, DICS_FLAG_GLOBAL, 0, DIREG_DEV, KEY_QUERY_VALUE)
 
-      if regKey != HKEY(-1):
-        # Then read the port name from the registry
-        yield getUnicodeValue("", "PortName", regKey)
+        if regKey != -1:
+          # Then read the port name from the registry
+          yield getUnicodeValue("", "PortName", regKey)
 
-    inc(index)
-
-  # Destroy the "device info set" once done with it
-  if not SetupDiDestroyDeviceInfoList(devInfoSet):
-    raiseOsError(osLastError())
+      inc(index)
+  finally:
+    # Destroy the "device info set" once done with it
+    if not SetupDiDestroyDeviceInfoList(devInfoSet):
+      raiseOsError(osLastError())

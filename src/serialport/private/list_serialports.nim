@@ -2,6 +2,8 @@
 
 when defined(windows):
   include ./list_serialports_win
-  # TODO: OS X specific version (using devicekit), posix versions
+elif defined(macosx):
+  # TODO: Mac support
+  include ./list_serialports_mac
 else:
   {.error: "Unsupported OS".}
