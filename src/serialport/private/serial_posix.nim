@@ -3,36 +3,100 @@
 import termios, posix, os
 include ./common
 
+var
+  TIOCEXCL* {.importc, header: "<termios.h>".}: cuint
+
+proc cfmakeraw*(termios: ptr Termios): void {.importc: "cfmakeraw",
+    header: "<termios.h>".}
+
 template checkCallResult(body: untyped): typed =
   ## Wraps a call to a function that returns `-1` on failure, and raises an OSError.
   if body == -1:
     raiseOSError(osLastError())
 
-proc setRawMode(options: var Termios) {.raises: [OSError].} =
-  ## Disable echo and set other options required to put the port into "raw" mode.
-  options.c_iflag = options.c_iflag and (not (IGNBRK or BRKINT or ICRNL or INLCR or PARMRK or INPCK or ISTRIP or IXON))
-  options.c_oflag = options.c_oflag and (not OPOST)
-  options.c_lflag = options.c_lflag and (not (ECHO or ECHONL or ICANON or IEXTEN or ISIG))
-  options.c_cflag = options.c_cflag and (not (CSIZE or PARENB))
+proc openPort(path: string): FileHandle {.raises: [OSError].} =
+  ## Open the serial port device file at `path`
 
-proc openSerialPort*(name: string): SerialPort {.raises: [InvalidPortNameError,OSError].} =
+  # Open the file as read/write
+  # Use O_NOCTTY as we don't want to be the "controlling terminal" for the port
+  # Use O_NDELAY as we don't care what state the DCD line is in.
+  result = open(path, O_RDWR or O_NOCTTY or O_NONBLOCK)
+  if result == -1:
+    raiseOSError(osLastError())
+
+  # Check the opened port is a serial port
+  if isatty(result) != 1:
+    discard close(result)
+    raiseOSError(osLastError())
+
+  # Prevent other `open()` calls with the same file except by root-owned processes
+  checkCallResult ioctl(result, TIOCEXCL)
+
+  # Make reads blocking
+  checkCallResult fcntl(result, F_SETFL, 0)
+
+proc setBaudRate(options: ptr Termios, br: BaudRate) {.raises: [OSError].} =
+  ## Set the baud rate on the given `Termios` instance.
+  let speed = Speed(br)
+  checkCallResult cfSetIspeed(options, speed)
+  checkCallResult cfSetOspeed(options, speed)
+
+proc setDataBits(options: ptr Termios, db: DataBits) =
+  ## Set the number of data bits on the given `Termios` instance.
+  case db
+  of DataBits.five:
+    options.c_cflag = options.c_cflag or CS5
+  of DataBits.six:
+    options.c_cflag = options.c_cflag or CS6
+  of DataBits.seven:
+    options.c_cflag = options.c_cflag or CS7
+  of DataBits.eight:
+    options.c_cflag = options.c_cflag or CS8
+
+proc setParity(options: ptr Termios, parity: Parity) =
+  ## Set the parity on the given `Termios` instance.
+  case parity
+  of Parity.none:
+    options.c_cflag = options.c_cflag and (not PARENB)
+  of Parity.odd:
+    options.c_cflag = options.c_cflag or (PARENB or PARODD)
+  of Parity.even:
+    options.c_cflag = options.c_cflag and (not PARODD)
+    options.c_cflag = options.c_cflag or PARENB
+
+proc setStopBits(options: ptr Termios, sb: StopBits) =
+  ## Set the number of stop bits on the given `Termios` instance.
+  case sb
+  of StopBits.one:
+    options.c_cflag = options.c_cflag and (not CSTOPB)
+  of StopBits.onePointFive, StopBits.two:
+    options.c_cflag = options.c_cflag or CSTOPB
+
+proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
+    dataBits: DataBits = DataBits.eight, parity: Parity = Parity.none,
+    stopBits: StopBits = StopBits.one): SerialPort {.raises: [InvalidPortNameError,OSError].} =
   ## Open the serial port with the given name.
   ##
   ## If the serial port at the given path is not found, a `InvalidPortNameError` will be raised.
   if len(name) < 1:
     raise newException(InvalidPortNameError, "Serial port name is required")
 
-  let h = posix.open(name, O_RDWR or O_NOCTTY or O_NONBLOCK)
-  if h == -1:
-    raiseOSError(osLastError())
-
-  if isatty(h) != 1:
-    raiseOSError(osLastError())
-
-  checkCallResult fcntl(h, F_SETFL, 0)
+  let h = openPort(name)
 
   var oldPortSettings: Termios
   checkCallResult tcGetAttr(h, addr oldPortSettings)
+
+  var newSettings: Termios = oldPortSettings
+
+  cfmakeraw(addr newSettings)
+  newSettings.c_cc[VMIN] = cuchar(1)
+  newSettings.c_cc[VTIME] = cuchar(10)
+  setBaudRate(addr newSettings, baudRate)
+  setDataBits(addr newSettings, dataBits)
+  setParity(addr newSettings, parity)
+
+  checkCallResult tcflush(h, TCIOFLUSH)
+  checkCallResult tcsetattr(h, TCSANOW, addr newSettings)
 
   result = SerialPort(
     name: name,
@@ -40,25 +104,17 @@ proc openSerialPort*(name: string): SerialPort {.raises: [InvalidPortNameError,O
     oldPortSettings: oldPortSettings
   )
 
-  # Flush the buffers of any pre-existing data
-  checkCallResult tcflush(h, TCIOFLUSH)
-
-  # Set default baud rate of 9600, input is same as output
-  checkCallResult cfsetispeed(addr oldPortSettings, B0)
-  checkCallResult cfsetospeed(addr oldPortSettings, B9600)
-  setRawMode(oldPortSettings)
-  checkCallResult tcSetAttr(h, TCSANOW, addr oldPortSettings)
-
 proc isClosed*(port: SerialPort): bool = port.handle == -1
   ## Determine whether the given port is open or closed.
 
 proc close*(port: SerialPort) =
   ## Close the seial port, restoring its original settings.
   if not port.isClosed:
+    checkCallResult tcdrain(port.handle)
+
     checkCallResult tcSetAttr(port.handle, TCSANOW, addr port.oldPortSettings)
 
-    if close(port.handle) == -1:
-      raiseOSError(osLastError())
+    checkCallResult close(port.handle)
 
     port.handle = -1
 
@@ -73,9 +129,7 @@ proc `baudRate=`*(port: SerialPort, br: BaudRate) {.raises: [PortClosedError, OS
   var options: Termios
   checkCallResult tcGetAttr(port.handle, addr options)
 
-  let speed = Speed(br)
-  checkCallResult cfSetIspeed(addr options, speed)
-  checkCallResult cfSetOspeed(addr options, speed)
+  setBaudRate(addr options, br)
 
   checkCallResult tcSetAttr(port.handle, TCSANOW, addr options)
 
@@ -95,15 +149,7 @@ proc `dataBits=`*(port: SerialPort, db: DataBits) {.raises: [PortClosedError, OS
   var options: Termios
   checkCallResult tcGetAttr(port.handle, addr options)
 
-  case db
-  of DataBits.five:
-    options.c_cflag = options.c_cflag or CS5
-  of DataBits.six:
-    options.c_cflag = options.c_cflag or CS6
-  of DataBits.seven:
-    options.c_cflag = options.c_cflag or CS7
-  of DataBits.eight:
-    options.c_cflag = options.c_cflag or CS8
+  setDataBits(addr options, db)
 
   checkCallResult tcSetAttr(port.handle, TCSANOW, addr options)
 
@@ -130,14 +176,7 @@ proc `parity=`*(port: SerialPort, parity: Parity) {.raises: [PortClosedError, OS
   var options: Termios
   checkCallResult tcGetAttr(port.handle, addr options)
 
-  case parity
-  of Parity.none:
-    options.c_cflag = options.c_cflag and (not PARENB)
-  of Parity.odd:
-    options.c_cflag = options.c_cflag or (PARENB or PARODD)
-  of Parity.even:
-    options.c_cflag = options.c_cflag and (not PARODD)
-    options.c_cflag = options.c_cflag or PARENB
+  setParity(addr options, parity)
 
   checkCallResult tcSetAttr(port.handle, TCSANOW, addr options)
 
@@ -162,11 +201,7 @@ proc `stopBits=`*(port: SerialPort, sb: StopBits) {.raises: [PortClosedError, OS
   var options: Termios
   checkCallResult tcGetAttr(port.handle, addr options)
 
-  case sb
-  of StopBits.one:
-    options.c_cflag = options.c_cflag and (not CSTOPB)
-  of StopBits.onePointFive, StopBits.two:
-    options.c_cflag = options.c_cflag or CSTOPB
+  setStopBits(addr options, sb)
 
   checkCallResult tcSetAttr(port.handle, TCSANOW, addr options)
 
@@ -198,3 +233,29 @@ proc write*(port: SerialPort, data: cstring) {.raises: [PortClosedError, OSError
 proc write*(port: SerialPort, data: string) {.raises: [PortClosedError, OSError], tags: WriteIOEffect.} =
   ## Write `data` to the serial port. This ensures that all of `data` is written.
   port.write(data.cstring)
+
+proc read*(port: SerialPort, data: pointer, size: int, timeoutSeconds: int = 5): int {.raises: [PortClosedError, PortReadTimeoutError, OSError], tags: ReadIOEffect.} =
+  ## Read from the serial port into the buffer pointed to by `data`, with buffer length `size`.
+  ##
+  ## This will return the number of bytes received, as it does not guarantee that the buffer will be filled completely.
+  checkPortIsNotClosed(port)
+
+  var
+    selectSet: TFdSet
+    timeout: Timeval
+  FD_ZERO(selectSet)
+  FD_SET(port.handle, selectSet)
+
+  timeout.tv_sec = timeoutSeconds
+
+  let selected = select(cint(port.handle), addr selectSet, nil, nil, addr timeout)
+
+  case selected
+  of -1:
+    raiseOSError(osLastError())
+  of 0:
+    raise newException(PortReadTimeoutError, "Read timed out after " & $timeoutSeconds & " seconds")
+  else:
+    result = read(port.handle, data, size)
+    if result == -1:
+      raiseOSError(osLastError())

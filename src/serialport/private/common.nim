@@ -44,7 +44,7 @@ type
     ## Represents a serial port.
     name: string
     when defined(posix):
-      handle: cint
+      handle: FileHandle
       oldPortSettings: Termios
 
   SerialPort* = ref SerialPortObj not nil
@@ -58,6 +58,12 @@ type
 
   PortClosedError* = object of SerialPortError
     ## Raised when an operation is attempted on a port that is closed.
+
+  PortReadError* = object of SerialPortError
+    ## Raised when an error occurs whilst reading a serial port.
+
+  PortReadTimeoutError* = object of SerialPortError
+    ## Raised when reading from a serial port times out.
 
 proc `$`*(port: Serialport): string = port.name
   ## Convert a port to a string, using the port's name.
