@@ -24,7 +24,7 @@ when isMainModule:
     sleep(5000)
 
     echo "Starting read..."
-    var data: cstring = newString(100).cstring
+    var data: string = newString(100)
     let numRead = writer.read(data[0].addr, len(data))
     echo "Read ", numRead, " bytes from the serial port: ", data
 
