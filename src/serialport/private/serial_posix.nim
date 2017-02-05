@@ -4,7 +4,8 @@ import termios, posix, os
 include ./common
 
 var
-  TIOCEXCL* {.importc, header: "<termios.h>".}: cuint
+  CCTS_OFLOW {.importc, header: "<termios.h>".}: cuint
+  CRTS_IFLOW {.importc, header: "<termios.h>".}: cuint
 
 proc cfmakeraw*(termios: ptr Termios): void {.importc: "cfmakeraw",
     header: "<termios.h>".}
@@ -28,9 +29,6 @@ proc openPort(path: string): FileHandle {.raises: [OSError].} =
   if isatty(result) != 1:
     discard close(result)
     raiseOSError(osLastError())
-
-  # Prevent other `open()` calls with the same file except by root-owned processes
-  checkCallResult ioctl(result, TIOCEXCL)
 
   # Make reads blocking
   checkCallResult fcntl(result, F_SETFL, 0)
@@ -72,9 +70,21 @@ proc setStopBits(options: ptr Termios, sb: StopBits) =
   of StopBits.onePointFive, StopBits.two:
     options.c_cflag = options.c_cflag or CSTOPB
 
+proc setCtsRts(options: ptr Termios, cts: bool, rts: bool) =
+  ## Set whether to use CTS flow control of output and RTS flow control of input.
+  if cts:
+    options.c_cflag = options.c_cflag or CCTS_OFLOW
+  else:
+    options.c_cflag = options.c_cflag or (not CCTS_OFLOW)
+
+  if rts:
+    options.c_cflag = options.c_cflag or CRTS_IFLOW
+  else:
+    options.c_cflag = options.c_cflag or (not CRTS_IFLOW)
+
 proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
     dataBits: DataBits = DataBits.eight, parity: Parity = Parity.none,
-    stopBits: StopBits = StopBits.one): SerialPort {.raises: [InvalidPortNameError,OSError].} =
+    stopBits: StopBits = StopBits.one, useCts: bool = true, useRts: bool = true): SerialPort {.raises: [InvalidPortNameError,OSError].} =
   ## Open the serial port with the given name.
   ##
   ## If the serial port at the given path is not found, a `InvalidPortNameError` will be raised.
@@ -90,10 +100,11 @@ proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
 
   cfmakeraw(addr newSettings)
   newSettings.c_cc[VMIN] = cuchar(1)
-  newSettings.c_cc[VTIME] = cuchar(10)
+  newSettings.c_cc[VTIME] = cuchar(5)
   setBaudRate(addr newSettings, baudRate)
   setDataBits(addr newSettings, dataBits)
   setParity(addr newSettings, parity)
+  setCtsRts(addr newSettings, useCts, useRts)
 
   checkCallResult tcflush(h, TCIOFLUSH)
   checkCallResult tcsetattr(h, TCSANOW, addr newSettings)
@@ -111,9 +122,7 @@ proc close*(port: SerialPort) =
   ## Close the seial port, restoring its original settings.
   if not port.isClosed:
     checkCallResult tcdrain(port.handle)
-
     checkCallResult tcSetAttr(port.handle, TCSANOW, addr port.oldPortSettings)
-
     checkCallResult close(port.handle)
 
     port.handle = -1
@@ -217,6 +226,30 @@ proc stopBits*(port: SerialPort): StopBits {.raises: [PortClosedError, OSError].
   else:
     result = StopBits.one
 
+proc `flowControl=`*(port: SerialPort, settings: FlowControlSettings) {.raises: [PortClosedError, OSError].} =
+  ## Set whether to use RTS and CTS flow control for sending/receiving data with the serial port.
+  checkPortIsNotClosed(port)
+
+  var options: Termios
+  checkCallResult tcGetAttr(port.handle, addr options)
+
+  setCtsRts(addr options, settings.cts, settings.rts)
+
+  checkCallResult tcSetAttr(port.handle, TCSANOW, addr options)
+
+proc flowControl*(port: SerialPort): FlowControlSettings {.raises: [PortClosedError, OSError].} =
+  ## Get whether RTS/CTS is enabled for the serial port.
+
+  checkPortIsNotClosed(port)
+
+  var options: Termios
+  checkCallResult tcGetAttr(port.handle, addr options)
+
+  result = (
+    cts: (options.c_cflag and CCTS_OFLOW) == CCTS_OFLOW,
+    rts: (options.c_cflag and CRTS_IFLOW) == CRTS_IFLOW,
+  )
+
 proc write*(port: SerialPort, data: cstring) {.raises: [PortClosedError, OSError], tags: [WriteIOEffect].} =
   ## Write `data` to the serial port. This ensures that all of `data` is written.
   checkPortIsNotClosed(port)
@@ -234,28 +267,38 @@ proc write*(port: SerialPort, data: string) {.raises: [PortClosedError, OSError]
   ## Write `data` to the serial port. This ensures that all of `data` is written.
   port.write(data.cstring)
 
-proc read*(port: SerialPort, data: pointer, size: int, timeoutSeconds: int = 5): int {.raises: [PortClosedError, PortReadTimeoutError, OSError], tags: ReadIOEffect.} =
+proc rawRead(handle: FileHandle, data: pointer, size: int): int {.inline, raises: [OSError], tags: [ReadIOEffect].} =
+  ## Raw read form the given file handle, without any timeout.
+  result = read(handle, data, size)
+  if result == -1:
+    raiseOSError(osLastError())
+
+proc read*(port: SerialPort, data: pointer, size: int, timeout: int = -1): int {.raises: [PortClosedError, PortReadTimeoutError, OSError], tags: [ReadIOEffect].} =
   ## Read from the serial port into the buffer pointed to by `data`, with buffer length `size`.
   ##
   ## This will return the number of bytes received, as it does not guarantee that the buffer will be filled completely.
+  ##
+  ## The read will time out after `timeout` seconds if no data is received in that time.
+  ## To disable timeouts, pass `-1` a the timeout parameter. When timeouts are disabled, this will block until at least 1 byte of data is received.
   checkPortIsNotClosed(port)
 
-  var
-    selectSet: TFdSet
-    timeout: Timeval
-  FD_ZERO(selectSet)
-  FD_SET(port.handle, selectSet)
+  if timeout > -1:
+    var
+      selectSet: TFdSet
+      timer: Timeval
+    FD_ZERO(selectSet)
+    FD_SET(port.handle, selectSet)
 
-  timeout.tv_sec = timeoutSeconds
+    timer.tv_sec = timeout
 
-  let selected = select(cint(port.handle), addr selectSet, nil, nil, addr timeout)
+    let selected = select(cint(port.handle + 1), addr selectSet, nil, nil, addr timer)
 
-  case selected
-  of -1:
-    raiseOSError(osLastError())
-  of 0:
-    raise newException(PortReadTimeoutError, "Read timed out after " & $timeoutSeconds & " seconds")
-  else:
-    result = read(port.handle, data, size)
-    if result == -1:
+    case selected
+    of -1:
       raiseOSError(osLastError())
+    of 0:
+      raise newException(PortReadTimeoutError, "Read timed out after " & $timeout & " seconds")
+    else:
+      result = rawRead(port.handle, data, size)
+  else:
+    result = rawRead(port.handle, data, size)

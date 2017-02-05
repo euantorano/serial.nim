@@ -47,6 +47,9 @@ type
       handle: FileHandle
       oldPortSettings: Termios
 
+  FlowControlSettings* = tuple[cts: bool, rts: bool]
+    ## Flow control settings for use with a serial port.
+
   SerialPort* = ref SerialPortObj not nil
     ## Represents a serial port.
 
