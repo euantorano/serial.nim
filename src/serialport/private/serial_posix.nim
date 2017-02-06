@@ -70,21 +70,24 @@ proc setStopBits(options: ptr Termios, sb: StopBits) =
   of StopBits.onePointFive, StopBits.two:
     options.c_cflag = options.c_cflag or CSTOPB
 
-proc setCtsRts(options: ptr Termios, cts: bool, rts: bool) =
-  ## Set whether to use CTS flow control of output and RTS flow control of input.
-  if cts:
-    options.c_cflag = options.c_cflag or CCTS_OFLOW
+proc setHardwareFlowControl(options: ptr Termios, enabled: bool) =
+  ## Set whether to use CTS/RTS flow control.
+  if enabled:
+    options.c_cflag = options.c_cflag or (CCTS_OFLOW or CRTS_IFLOW)
   else:
-    options.c_cflag = options.c_cflag or (not CCTS_OFLOW)
+    options.c_cflag = options.c_cflag and (not (CCTS_OFLOW or CRTS_IFLOW))
 
-  if rts:
-    options.c_cflag = options.c_cflag or CRTS_IFLOW
+proc setSoftwareFlowControl(options: ptr Termios, enabled: bool) =
+  ## Set whether to use XON/XOFF software flow control.
+  if enabled:
+    options.c_iflag = options.c_cflag or (IXON or IXOFF or IXANY)
   else:
-    options.c_cflag = options.c_cflag or (not CRTS_IFLOW)
+    options.c_iflag = options.c_cflag and (not (IXON or IXOFF or IXANY))
 
 proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
     dataBits: DataBits = DataBits.eight, parity: Parity = Parity.none,
-    stopBits: StopBits = StopBits.one, useCts: bool = true, useRts: bool = true): SerialPort {.raises: [InvalidPortNameError,OSError].} =
+    stopBits: StopBits = StopBits.one, useHardwareFlowControl: bool = false,
+    useSoftwareFlowControl: bool = false): SerialPort {.raises: [InvalidPortNameError,OSError].} =
   ## Open the serial port with the given name.
   ##
   ## If the serial port at the given path is not found, a `InvalidPortNameError` will be raised.
@@ -104,7 +107,8 @@ proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
   setBaudRate(addr newSettings, baudRate)
   setDataBits(addr newSettings, dataBits)
   setParity(addr newSettings, parity)
-  setCtsRts(addr newSettings, useCts, useRts)
+  setHardwareFlowControl(addr newSettings, useHardwareFlowControl)
+  setSoftwareFlowControl(addr newSettings, useSoftwareFlowControl)
 
   checkCallResult tcflush(h, TCIOFLUSH)
   checkCallResult tcsetattr(h, TCSANOW, addr newSettings)
@@ -226,18 +230,18 @@ proc stopBits*(port: SerialPort): StopBits {.raises: [PortClosedError, OSError].
   else:
     result = StopBits.one
 
-proc `flowControl=`*(port: SerialPort, settings: FlowControlSettings) {.raises: [PortClosedError, OSError].} =
+proc `hardwareFlowControl=`*(port: SerialPort, enabled: bool) {.raises: [PortClosedError, OSError].} =
   ## Set whether to use RTS and CTS flow control for sending/receiving data with the serial port.
   checkPortIsNotClosed(port)
 
   var options: Termios
   checkCallResult tcGetAttr(port.handle, addr options)
 
-  setCtsRts(addr options, settings.cts, settings.rts)
+  setHardwareFlowControl(addr options, enabled)
 
   checkCallResult tcSetAttr(port.handle, TCSANOW, addr options)
 
-proc flowControl*(port: SerialPort): FlowControlSettings {.raises: [PortClosedError, OSError].} =
+proc hardwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OSError].} =
   ## Get whether RTS/CTS is enabled for the serial port.
 
   checkPortIsNotClosed(port)
@@ -245,10 +249,31 @@ proc flowControl*(port: SerialPort): FlowControlSettings {.raises: [PortClosedEr
   var options: Termios
   checkCallResult tcGetAttr(port.handle, addr options)
 
-  result = (
-    cts: (options.c_cflag and CCTS_OFLOW) == CCTS_OFLOW,
-    rts: (options.c_cflag and CRTS_IFLOW) == CRTS_IFLOW,
-  )
+  result = (options.c_cflag and CCTS_OFLOW) == CCTS_OFLOW and
+    (options.c_cflag and CRTS_IFLOW) == CRTS_IFLOW
+
+proc `softwareFlowControl=`*(port: SerialPort, enabled: bool) {.raises: [PortClosedError, OSError].} =
+  ## Set whether to use RTS and CTS flow control for sending/receiving data with the serial port.
+  checkPortIsNotClosed(port)
+
+  var options: Termios
+  checkCallResult tcGetAttr(port.handle, addr options)
+
+  setSoftwareFlowControl(addr options, enabled)
+
+  checkCallResult tcSetAttr(port.handle, TCSANOW, addr options)
+
+proc softwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OSError].} =
+  ## Get whether RTS/CTS is enabled for the serial port.
+
+  checkPortIsNotClosed(port)
+
+  var options: Termios
+  checkCallResult tcGetAttr(port.handle, addr options)
+
+  result = (options.c_cflag and IXON)== IXON and
+    (options.c_cflag and IXOFF) == IXOFF and
+    (options.c_cflag and IXANY) == IXANY
 
 proc write*(port: SerialPort, data: cstring) {.raises: [PortClosedError, OSError], tags: [WriteIOEffect].} =
   ## Write `data` to the serial port. This ensures that all of `data` is written.

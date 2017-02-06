@@ -6,14 +6,15 @@ const
 
 when isMainModule:
   proc main() =
-    let writer = openSerialPort(writePort)
+    let writer = openSerialPort(writePort, useHardwareFlowControl=true)
     defer: close(writer)
 
     echo "Baud rate: ", writer.baudRate
     echo "Data bits: ", writer.dataBits
     echo "Parity: ", writer.parity
     echo "Stop bits: ", writer.stopBits
-    echo "Flow control: ", writer.flowControl
+    echo "Hardware flow control: ", writer.hardwareFlowControl
+    echo "Software flow control: ", writer.softwareFlowControl
 
     writer.write("Hiya")
 
