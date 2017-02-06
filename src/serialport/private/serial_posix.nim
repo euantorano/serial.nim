@@ -1,7 +1,6 @@
 ## POSIX implementation of serial port handling.
 
 import termios, posix, os
-include ./common
 
 var
   CCTS_OFLOW {.importc, header: "<termios.h>".}: cuint
@@ -87,7 +86,7 @@ proc setSoftwareFlowControl(options: ptr Termios, enabled: bool) =
 proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
     dataBits: DataBits = DataBits.eight, parity: Parity = Parity.none,
     stopBits: StopBits = StopBits.one, useHardwareFlowControl: bool = false,
-    useSoftwareFlowControl: bool = false): SerialPort {.raises: [InvalidPortNameError,OSError].} =
+    useSoftwareFlowControl: bool = false): SerialPort {.raises: [InvalidPortNameError, OSError].} =
   ## Open the serial port with the given name.
   ##
   ## If the serial port at the given path is not found, a `InvalidPortNameError` will be raised.
@@ -122,7 +121,7 @@ proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
 proc isClosed*(port: SerialPort): bool = port.handle == -1
   ## Determine whether the given port is open or closed.
 
-proc close*(port: SerialPort) =
+proc close*(port: SerialPort) {.raises: [OSError].} =
   ## Close the seial port, restoring its original settings.
   if not port.isClosed:
     checkCallResult tcdrain(port.handle)
@@ -231,7 +230,7 @@ proc stopBits*(port: SerialPort): StopBits {.raises: [PortClosedError, OSError].
     result = StopBits.one
 
 proc `hardwareFlowControl=`*(port: SerialPort, enabled: bool) {.raises: [PortClosedError, OSError].} =
-  ## Set whether to use RTS and CTS flow control for sending/receiving data with the serial port.
+  ## Set whether to use RTS/CTS hardware flow control for sending/receiving data with the serial port.
   checkPortIsNotClosed(port)
 
   var options: Termios
@@ -242,8 +241,7 @@ proc `hardwareFlowControl=`*(port: SerialPort, enabled: bool) {.raises: [PortClo
   checkCallResult tcSetAttr(port.handle, TCSANOW, addr options)
 
 proc hardwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OSError].} =
-  ## Get whether RTS/CTS is enabled for the serial port.
-
+  ## Get whether RTS/CTS hardware flow control is enabled for the serial port.
   checkPortIsNotClosed(port)
 
   var options: Termios
@@ -253,7 +251,7 @@ proc hardwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OS
     (options.c_cflag and CRTS_IFLOW) == CRTS_IFLOW
 
 proc `softwareFlowControl=`*(port: SerialPort, enabled: bool) {.raises: [PortClosedError, OSError].} =
-  ## Set whether to use RTS and CTS flow control for sending/receiving data with the serial port.
+  ## Set whether to use XON/XOFF software flow control for sending/receiving data with the serial port.
   checkPortIsNotClosed(port)
 
   var options: Termios
@@ -264,8 +262,7 @@ proc `softwareFlowControl=`*(port: SerialPort, enabled: bool) {.raises: [PortClo
   checkCallResult tcSetAttr(port.handle, TCSANOW, addr options)
 
 proc softwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OSError].} =
-  ## Get whether RTS/CTS is enabled for the serial port.
-
+  ## Get whether XON?XOFF software flow control is enabled for the serial port.
   checkPortIsNotClosed(port)
 
   var options: Termios
@@ -298,7 +295,8 @@ proc rawRead(handle: FileHandle, data: pointer, size: int): int {.inline, raises
   if result == -1:
     raiseOSError(osLastError())
 
-proc read*(port: SerialPort, data: pointer, size: int, timeout: int = -1): int {.raises: [PortClosedError, PortReadTimeoutError, OSError], tags: [ReadIOEffect].} =
+proc read*(port: SerialPort, data: pointer, size: int, timeout: int = -1): int
+  {.raises: [PortClosedError, PortReadTimeoutError, OSError], tags: [ReadIOEffect].} =
   ## Read from the serial port into the buffer pointed to by `data`, with buffer length `size`.
   ##
   ## This will return the number of bytes received, as it does not guarantee that the buffer will be filled completely.
