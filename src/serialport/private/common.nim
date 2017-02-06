@@ -6,7 +6,7 @@ when defined(posix):
 type
   Parity* {.pure.} = enum
     ## Allowable parities for the serial port.
-    none, odd, even
+    none, odd, even, space
 
   BaudRate* {.pure.} = enum
     ## Serial baud rates.

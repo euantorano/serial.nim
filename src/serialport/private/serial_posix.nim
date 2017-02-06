@@ -3,15 +3,15 @@
 import termios, posix, os
 
 var
-  CCTS_OFLOW {.importc, header: "<termios.h>".}: cuint
   CRTS_IFLOW {.importc, header: "<termios.h>".}: cuint
+  CCTS_OFLOW {.importc, header: "<termios.h>".}: cuint
 
 proc cfmakeraw*(termios: ptr Termios): void {.importc: "cfmakeraw",
     header: "<termios.h>".}
 
-template checkCallResult(body: untyped): typed =
+proc checkCallResult(callResult: int) {.raises: [OSError], inline.} =
   ## Wraps a call to a function that returns `-1` on failure, and raises an OSError.
-  if body == -1:
+  if callResult == -1:
     raiseOSError(osLastError())
 
 proc openPort(path: string): FileHandle {.raises: [OSError].} =
@@ -38,8 +38,10 @@ proc setBaudRate(options: ptr Termios, br: BaudRate) {.raises: [OSError].} =
   checkCallResult cfSetIspeed(options, speed)
   checkCallResult cfSetOspeed(options, speed)
 
-proc setDataBits(options: ptr Termios, db: DataBits) =
+proc setDataBits(options: var Termios, db: DataBits) =
   ## Set the number of data bits on the given `Termios` instance.
+  options.c_cflag = options.c_cflag and (not CSIZE)
+
   case db
   of DataBits.five:
     options.c_cflag = options.c_cflag or CS5
@@ -50,18 +52,18 @@ proc setDataBits(options: ptr Termios, db: DataBits) =
   of DataBits.eight:
     options.c_cflag = options.c_cflag or CS8
 
-proc setParity(options: ptr Termios, parity: Parity) =
+proc setParity(options: var Termios, parity: Parity) =
   ## Set the parity on the given `Termios` instance.
   case parity
-  of Parity.none:
+  of Parity.none, Parity.space:
     options.c_cflag = options.c_cflag and (not PARENB)
   of Parity.odd:
     options.c_cflag = options.c_cflag or (PARENB or PARODD)
   of Parity.even:
-    options.c_cflag = options.c_cflag and (not PARODD)
     options.c_cflag = options.c_cflag or PARENB
+    options.c_cflag = options.c_cflag and (not PARODD)
 
-proc setStopBits(options: ptr Termios, sb: StopBits) =
+proc setStopBits(options: var Termios, sb: StopBits) =
   ## Set the number of stop bits on the given `Termios` instance.
   case sb
   of StopBits.one:
@@ -69,14 +71,14 @@ proc setStopBits(options: ptr Termios, sb: StopBits) =
   of StopBits.onePointFive, StopBits.two:
     options.c_cflag = options.c_cflag or CSTOPB
 
-proc setHardwareFlowControl(options: ptr Termios, enabled: bool) =
+proc setHardwareFlowControl(options: var Termios, enabled: bool) =
   ## Set whether to use CTS/RTS flow control.
   if enabled:
-    options.c_cflag = options.c_cflag or (CCTS_OFLOW or CRTS_IFLOW)
+    options.c_cflag = options.c_cflag or (CRTS_IFLOW or CCTS_OFLOW)
   else:
-    options.c_cflag = options.c_cflag and (not (CCTS_OFLOW or CRTS_IFLOW))
+    options.c_cflag = options.c_cflag and (not (CRTS_IFLOW or CCTS_OFLOW))
 
-proc setSoftwareFlowControl(options: ptr Termios, enabled: bool) =
+proc setSoftwareFlowControl(options: var Termios, enabled: bool) =
   ## Set whether to use XON/XOFF software flow control.
   if enabled:
     options.c_iflag = options.c_cflag or (IXON or IXOFF or IXANY)
@@ -98,16 +100,17 @@ proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
   var oldPortSettings: Termios
   checkCallResult tcGetAttr(h, addr oldPortSettings)
 
-  var newSettings: Termios = oldPortSettings
+  var newSettings: Termios
 
   cfmakeraw(addr newSettings)
   newSettings.c_cc[VMIN] = cuchar(1)
   newSettings.c_cc[VTIME] = cuchar(5)
   setBaudRate(addr newSettings, baudRate)
-  setDataBits(addr newSettings, dataBits)
-  setParity(addr newSettings, parity)
-  setHardwareFlowControl(addr newSettings, useHardwareFlowControl)
-  setSoftwareFlowControl(addr newSettings, useSoftwareFlowControl)
+  setDataBits(newSettings, dataBits)
+  setStopBits(newSettings, stopBits)
+  setParity(newSettings, parity)
+  setHardwareFlowControl(newSettings, useHardwareFlowControl)
+  setSoftwareFlowControl(newSettings, useSoftwareFlowControl)
 
   checkCallResult tcflush(h, TCIOFLUSH)
   checkCallResult tcsetattr(h, TCSANOW, addr newSettings)
@@ -161,7 +164,7 @@ proc `dataBits=`*(port: SerialPort, db: DataBits) {.raises: [PortClosedError, OS
   var options: Termios
   checkCallResult tcGetAttr(port.handle, addr options)
 
-  setDataBits(addr options, db)
+  setDataBits(options, db)
 
   checkCallResult tcSetAttr(port.handle, TCSANOW, addr options)
 
@@ -188,7 +191,7 @@ proc `parity=`*(port: SerialPort, parity: Parity) {.raises: [PortClosedError, OS
   var options: Termios
   checkCallResult tcGetAttr(port.handle, addr options)
 
-  setParity(addr options, parity)
+  setParity(options, parity)
 
   checkCallResult tcSetAttr(port.handle, TCSANOW, addr options)
 
@@ -213,7 +216,7 @@ proc `stopBits=`*(port: SerialPort, sb: StopBits) {.raises: [PortClosedError, OS
   var options: Termios
   checkCallResult tcGetAttr(port.handle, addr options)
 
-  setStopBits(addr options, sb)
+  setStopBits(options, sb)
 
   checkCallResult tcSetAttr(port.handle, TCSANOW, addr options)
 
@@ -236,7 +239,7 @@ proc `hardwareFlowControl=`*(port: SerialPort, enabled: bool) {.raises: [PortClo
   var options: Termios
   checkCallResult tcGetAttr(port.handle, addr options)
 
-  setHardwareFlowControl(addr options, enabled)
+  setHardwareFlowControl(options, enabled)
 
   checkCallResult tcSetAttr(port.handle, TCSANOW, addr options)
 
@@ -247,8 +250,7 @@ proc hardwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OS
   var options: Termios
   checkCallResult tcGetAttr(port.handle, addr options)
 
-  result = (options.c_cflag and CCTS_OFLOW) == CCTS_OFLOW and
-    (options.c_cflag and CRTS_IFLOW) == CRTS_IFLOW
+  result = (options.c_cflag and (CRTS_IFLOW or CCTS_OFLOW)) == (CRTS_IFLOW or CCTS_OFLOW)
 
 proc `softwareFlowControl=`*(port: SerialPort, enabled: bool) {.raises: [PortClosedError, OSError].} =
   ## Set whether to use XON/XOFF software flow control for sending/receiving data with the serial port.
@@ -257,7 +259,7 @@ proc `softwareFlowControl=`*(port: SerialPort, enabled: bool) {.raises: [PortClo
   var options: Termios
   checkCallResult tcGetAttr(port.handle, addr options)
 
-  setSoftwareFlowControl(addr options, enabled)
+  setSoftwareFlowControl(options, enabled)
 
   checkCallResult tcSetAttr(port.handle, TCSANOW, addr options)
 
@@ -268,9 +270,7 @@ proc softwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OS
   var options: Termios
   checkCallResult tcGetAttr(port.handle, addr options)
 
-  result = (options.c_cflag and IXON)== IXON and
-    (options.c_cflag and IXOFF) == IXOFF and
-    (options.c_cflag and IXANY) == IXANY
+  result = (options.c_cflag and (IXON or IXOFF or IXANY)) == (IXON or IXOFF or IXANY)
 
 proc write*(port: SerialPort, data: cstring) {.raises: [PortClosedError, OSError], tags: [WriteIOEffect].} =
   ## Write `data` to the serial port. This ensures that all of `data` is written.

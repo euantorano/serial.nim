@@ -6,7 +6,7 @@ const
 
 when isMainModule:
   proc main() =
-    let writer = openSerialPort(writePort, useHardwareFlowControl=true)
+    let writer = openSerialPort(writePort, useHardwareFlowControl=true, useSoftwareFlowControl=true)
     defer: close(writer)
 
     echo "Baud rate: ", writer.baudRate

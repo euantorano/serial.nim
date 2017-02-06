@@ -5,7 +5,7 @@ A library to work with serial ports using pure Nim.
 ## Todo List
 
 - [ ] Basic port reading/writing for Windows/Posix
-    - [ ] Posix
+    - [X] Posix
     - [ ] Windows
 - [ ] Port setting control - baud rate, stop bits, databits, parity
     - [X] Posix
