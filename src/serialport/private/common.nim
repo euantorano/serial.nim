@@ -2,6 +2,8 @@
 
 when defined(posix):
   import termios
+elif defined(windows):
+  import winlean
 
 type
   Parity* {.pure.} = enum
@@ -46,6 +48,8 @@ type
     when defined(posix):
       handle: FileHandle
       oldPortSettings: Termios
+    elif defined(windows):
+      handle: HANDLE
 
   FlowControlSettings* = tuple[cts: bool, rts: bool]
     ## Flow control settings for use with a serial port.

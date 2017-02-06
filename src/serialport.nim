@@ -69,3 +69,7 @@ when defined(nimdoc):
     ## To disable timeouts, pass `-1` a the timeout parameter. When timeouts are disabled, this will block until at least 1 byte of data is received.
 elif defined(posix):
   include serialport/private/serial_posix
+elif defined(windows):
+  include serialport/private/serial_windows
+else:
+  {.error: "Serial port handling not implemented for your platform".}

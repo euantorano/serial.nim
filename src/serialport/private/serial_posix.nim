@@ -30,7 +30,9 @@ proc openPort(path: string): FileHandle {.raises: [OSError].} =
     raiseOSError(osLastError())
 
   # Make reads blocking
-  checkCallResult fcntl(result, F_SETFL, 0)
+  if fcntl(result, F_SETFL, 0) == -1:
+    discard close(result)
+    raiseOSError(osLastError())
 
 proc setBaudRate(options: ptr Termios, br: BaudRate) {.raises: [OSError].} =
   ## Set the baud rate on the given `Termios` instance.
@@ -98,7 +100,9 @@ proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
   let h = openPort(name)
 
   var oldPortSettings: Termios
-  checkCallResult tcGetAttr(h, addr oldPortSettings)
+  if tcGetAttr(h, addr oldPortSettings) == -1:
+    discard close(h)
+    raiseOSError(osLastError())
 
   var newSettings: Termios
 
@@ -112,8 +116,13 @@ proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
   setHardwareFlowControl(newSettings, useHardwareFlowControl)
   setSoftwareFlowControl(newSettings, useSoftwareFlowControl)
 
-  checkCallResult tcflush(h, TCIOFLUSH)
-  checkCallResult tcsetattr(h, TCSANOW, addr newSettings)
+  if tcflush(h, TCIOFLUSH) == -1:
+    discard close(h)
+    raiseOSError(osLastError())
+
+  if tcsetattr(h, TCSANOW, addr newSettings) == -1:
+    discard close(h)
+    raiseOSError(osLastError())
 
   result = SerialPort(
     name: name,
