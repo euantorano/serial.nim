@@ -1,8 +1,8 @@
 # Common definitions shared between platform specific implementations.
 
-when defined(posix):
+when defined(posix) and not defined(nimdoc):
   import termios
-elif defined(windows):
+elif defined(windows) and not defined(nimdoc):
   import winlean
 
 type
@@ -45,10 +45,10 @@ type
   SerialPortObj = object
     ## Represents a serial port.
     name: string
-    when defined(posix):
+    when defined(posix) and not defined(nimdoc):
       handle: FileHandle
       oldPortSettings: Termios
-    elif defined(windows):
+    elif defined(windows) and not defined(nimdoc):
       handle: HANDLE
       readTimeoutSeconds: uint
       writeTimeoutSeconds: uint

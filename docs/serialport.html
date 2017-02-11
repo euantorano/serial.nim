@@ -1209,12 +1209,6 @@ function main() {
   </div>
   <ul class="simple simple-toc" id="toc-list">
 <li>
-  <a class="reference reference-toplevel" href="#6" id="56">Imports</a>
-  <ul class="simple simple-toc-section">
-    
-  </ul>
-</li>
-<li>
   <a class="reference reference-toplevel" href="#7" id="57">Types</a>
   <ul class="simple simple-toc-section">
       <li><a class="reference" href="#Parity"
@@ -1289,6 +1283,8 @@ function main() {
     title="softwareFlowControl=(port: SerialPort; enabled: bool)"><wbr />software<wbr />Flow<wbr />Control=<span class="attachedType" style="visibility:hidden">SerialPort</span></a></li>
   <li><a class="reference" href="#softwareFlowControl,SerialPort"
     title="softwareFlowControl(port: SerialPort): bool"><wbr />software<wbr />Flow<wbr />Control<span class="attachedType" style="visibility:hidden">SerialPort</span></a></li>
+  <li><a class="reference" href="#write,SerialPort,pointer,int,uint"
+    title="write(port: SerialPort; data: pointer; length: int; timeout: uint = 0): int"><wbr />write<span class="attachedType" style="visibility:hidden">SerialPort</span></a></li>
   <li><a class="reference" href="#write,SerialPort,cstring,uint"
     title="write(port: SerialPort; data: cstring; timeout: uint = 0)"><wbr />write<span class="attachedType" style="visibility:hidden">SerialPort</span></a></li>
   <li><a class="reference" href="#read,SerialPort,pointer,int,uint"
@@ -1305,12 +1301,7 @@ function main() {
   <div class="nine columns" id="content">
   <div id="tocRoot"></div>
   <p class="module-desc">A library to work with serial ports using pure Nim.</p>
-  <div class="section" id="6">
-<h1><a class="toc-backref" href="#6">Imports</a></h1>
-<dl class="item">
-<a class="reference external" href="termios.html">termios</a>
-</dl></div>
-<div class="section" id="7">
+  <div class="section" id="7">
 <h1><a class="toc-backref" href="#7">Types</a></h1>
 <dl class="item">
 <dt id="Parity"><a name="Parity"></a><pre><span class="Identifier">Parity</span> <span class="Other">=</span> <span class="Keyword">enum</span>
@@ -1602,14 +1593,24 @@ class="link-seesrc" target="_blank">Source</a>
 <a href="/edit/devel/src/serialport.nim#L53" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
+<dt id="write"><a name="write,SerialPort,pointer,int,uint"></a><pre><span class="Keyword">proc</span> <span class="Identifier">write</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">;</span> <span class="Identifier">data</span><span class="Other">:</span> <span class="Identifier">pointer</span><span class="Other">;</span> <span class="Identifier">length</span><span class="Other">:</span> <span class="Identifier">int</span><span class="Other">;</span> <span class="Identifier">timeout</span><span class="Other">:</span> <span class="Identifier">uint</span> <span class="Other">=</span> <span class="DecNumber">0</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">int</span> <span class="Other pragmabegin">{.</span><div class="pragma">
+    <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">PortClosedError</span><span class="Other">,</span> <span class="Identifier">PortTimeoutError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">WriteIOEffect</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dd>
+Write the data in the buffer pointed to by <cite>data</cite> with the given <cite>length</cite> to the serial port.
+&nbsp;&nbsp;<a
+href="/tree/master/src/serialport.nim#L56"
+class="link-seesrc" target="_blank">Source</a>
+<a href="/edit/devel/src/serialport.nim#L56" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
 <dt id="write"><a name="write,SerialPort,cstring,uint"></a><pre><span class="Keyword">proc</span> <span class="Identifier">write</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">;</span> <span class="Identifier">data</span><span class="Other">:</span> <span class="Identifier">cstring</span><span class="Other">;</span> <span class="Identifier">timeout</span><span class="Other">:</span> <span class="Identifier">uint</span> <span class="Other">=</span> <span class="DecNumber">0</span><span class="Other">)</span> <span class="Other pragmabegin">{.</span><div class="pragma">
     <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">PortClosedError</span><span class="Other">,</span> <span class="Identifier">PortTimeoutError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">WriteIOEffect</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Write <cite>data</cite> to the serial port. This ensures that all of <cite>data</cite> is written.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L56"
+href="/tree/master/src/serialport.nim#L59"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L56" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/serialport.nim#L59" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="read"><a name="read,SerialPort,pointer,int,uint"></a><pre><span class="Keyword">proc</span> <span class="Identifier">read</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">;</span> <span class="Identifier">data</span><span class="Other">:</span> <span class="Identifier">pointer</span><span class="Other">;</span> <span class="Identifier">size</span><span class="Other">:</span> <span class="Identifier">int</span><span class="Other">;</span> <span class="Identifier">timeout</span><span class="Other">:</span> <span class="Identifier">uint</span> <span class="Other">=</span> <span class="DecNumber">0</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">int</span> <span class="Other pragmabegin">{.</span><div class="pragma">
@@ -1620,9 +1621,9 @@ class="link-seesrc" target="_blank">Source</a>
 <p>The read will time out after <cite>timeout</cite> seconds if no data is received in that time. To disable timeouts, pass <cite>0</cite> as the timeout parameter. When timeouts are disabled, this will block until at least 1 byte of data is received.</p>
 
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L59"
+href="/tree/master/src/serialport.nim#L62"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L59" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/serialport.nim#L62" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="write"><a name="write,SerialPort,string,uint"></a><pre><span class="Keyword">proc</span> <span class="Identifier">write</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">;</span> <span class="Identifier">data</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">timeout</span><span class="Other">:</span> <span class="Identifier">uint</span> <span class="Other">=</span> <span class="DecNumber">0</span><span class="Other">)</span> <span class="Other pragmabegin">{.</span><div class="pragma">
@@ -1632,9 +1633,9 @@ class="link-seesrc" target="_blank">Source</a>
 <p>You can optionally set a timeout (in seconds) for the write operation by passing a non-zero <cite>timeout</cite> value.</p>
 
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L74"
+href="/tree/master/src/serialport.nim#L77"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L74" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/serialport.nim#L77" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 
@@ -1647,7 +1648,7 @@ class="link-seesrc" target="_blank">Source</a>
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small>Made with Nim. Generated: 2017-02-11 16:20:07 UTC</small>
+        <small>Made with Nim. Generated: 2017-02-11 16:44:24 UTC</small>
       </div>
     </div>
   </div>
