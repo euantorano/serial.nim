@@ -110,7 +110,7 @@ proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
 
   cfmakeraw(addr newSettings)
   newSettings.c_cc[VMIN] = cuchar(1)
-  newSettings.c_cc[VTIME] = cuchar(5)
+  newSettings.c_cc[VTIME] = cuchar(10)
   setBaudRate(addr newSettings, baudRate)
   setDataBits(newSettings, dataBits)
   setStopBits(newSettings, stopBits)
