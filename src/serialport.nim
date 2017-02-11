@@ -53,6 +53,9 @@ when defined(nimdoc):
   proc softwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OSError].} = discard
     ## Get whether XON?XOFF software flow control is enabled for the serial port.
 
+  proc write*(port: SerialPort, data: pointer, length: int, timeout: uint = 0): int {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [WriteIOEffect].} =
+    ## Write the data in the buffer pointed to by `data` with the given `length` to the serial port.
+
   proc write*(port: SerialPort, data: cstring, timeout: uint = 0) {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [WriteIOEffect].} = discard
     ## Write `data` to the serial port. This ensures that all of `data` is written.
 

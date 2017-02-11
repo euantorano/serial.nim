@@ -16,7 +16,11 @@ when isMainModule:
     echo "Hardware flow control: ", writer.hardwareFlowControl
     echo "Software flow control: ", writer.softwareFlowControl
 
-    writer.write("Hiya")
+    var rawWriteData = "Hello World!\n"
+
+    echo "Wrote ", writer.write(rawWriteData[0].addr, len(rawWriteData)), " bytes to the serial port"
+
+    writer.write("All of this data is assured to be written unless an error occurs.")
 
     echo "Starting read..."
     var data: string = newString(100)

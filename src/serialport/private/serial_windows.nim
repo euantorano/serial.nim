@@ -345,6 +345,23 @@ proc softwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OS
 
   result = options.fOutX != 0 and options.fInX != 0
 
+proc write*(port: SerialPort, data: pointer, length: int, timeout: uint = 0): int {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [WriteIOEffect].} =
+  ## Write the data in the buffer pointed to by `data` with the given `length` to the serial port.
+  checkPortIsNotClosed(port)
+
+  # if the last write operation used the same timeout, do not change the timeout.
+  if timeout != port.writeTimeoutSeconds:
+    setWriteTimeout(port, timeout)
+
+  var numWritten: int32
+  if writeFile(port.handle, data[totalWritten].unsafeAddr, dataLen - totalWritten, addr numWritten, nil) == 0:
+    raiseOSError(osLastError())
+
+  if numWritten == 0:
+    raise newException(PortTimeoutError, "Write timed out after " & $timeout & " seconds")
+
+  result = int(numWritten)
+
 proc write*(port: SerialPort, data: cstring, timeout: uint = 0) {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [WriteIOEffect].} =
   ## Write `data` to the serial port. This ensures that all of `data` is written.
   ##

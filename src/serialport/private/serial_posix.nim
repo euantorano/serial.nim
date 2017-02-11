@@ -283,6 +283,31 @@ proc softwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OS
 
   result = (options.c_cflag and (IXON or IXOFF or IXANY)) == (IXON or IXOFF or IXANY)
 
+proc write*(port: SerialPort, data: pointer, length: int, timeout: uint = 0): int {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [WriteIOEffect].} =
+  ## Write the data in the buffer pointed to by `data` with the given `length` to the serial port.
+  checkPortIsNotClosed(port)
+
+  if timeout > 0'u:
+    var
+      selectSet: TFdSet
+      timer: Timeval
+    FD_ZERO(selectSet)
+    FD_SET(port.handle, selectSet)
+
+    let selected = select(cint(port.handle + 1), nil, addr selectSet, nil, addr timer)
+
+    case selected
+    of -1:
+      raiseOSError(osLastError())
+    of 0:
+      raise newException(PortTimeoutError, "Write timed out after " & $timeout & " seconds")
+    else:
+      result = write(port.handle, data, length)
+  else:
+    result = write(port.handle, data, length)
+    if result == -1:
+      raiseOSError(osLastError())
+
 proc write*(port: SerialPort, data: cstring, timeout: uint = 0) {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [WriteIOEffect].} =
   ## Write `data` to the serial port. This ensures that all of `data` is written.
   checkPortIsNotClosed(port)
@@ -295,11 +320,12 @@ proc write*(port: SerialPort, data: cstring, timeout: uint = 0) {.raises: [PortC
     var
       selectSet: TFdSet
       timer: Timeval
+      selected: cint
     FD_ZERO(selectSet)
     FD_SET(port.handle, selectSet)
 
     while totalWritten < len(data):
-      let selected = select(cint(port.handle + 1), nil, addr selectSet, nil, addr timer)
+      selected = select(cint(port.handle + 1), nil, addr selectSet, nil, addr timer)
 
       case selected
       of -1:
