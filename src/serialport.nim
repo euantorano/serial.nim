@@ -6,7 +6,7 @@ when defined(nimdoc):
   proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
       dataBits: DataBits = DataBits.eight, parity: Parity = Parity.none,
       stopBits: StopBits = StopBits.one, useHardwareFlowControl: bool = false,
-      useSoftwareFlowControl: bool = false): SerialPort {.raises: [InvalidPortNameError, OSError].} = discard
+      useSoftwareFlowControl: bool = false): SerialPort {.raises: [InvalidPortNameError, ParityUnknownError, OSError].} = discard
     ## Open the serial port with the given name.
     ##
     ## If the serial port at the given path is not found, a `InvalidPortNameError` will be raised.
@@ -29,16 +29,16 @@ when defined(nimdoc):
   proc dataBits*(port: SerialPort): DataBits {.raises: [PortClosedError, OSError].} = discard
     ## Get the number of data bits that the serial port operates with.
 
-  proc `parity=`*(port: SerialPort, parity: Parity) {.raises: [PortClosedError, OSError].} = discard
+  proc `parity=`*(port: SerialPort, parity: Parity) {.raises: [PortClosedError, ParityUnknownError, OSError].} = discard
     ## Set the parity that the serial port operates with.
 
-  proc parity*(port: SerialPort): Parity {.raises: [PortClosedError, OSError].} = discard
+  proc parity*(port: SerialPort): Parity {.raises: [PortClosedError, ParityUnknownError, OSError].} = discard
     ## Get the parity that the serial port operates with.
 
   proc `stopBits=`*(port: SerialPort, sb: StopBits) {.raises: [PortClosedError, OSError].} = discard
     ## Set the number of stop bits that the serial port operates with.
 
-  proc stopBits*(port: SerialPort): StopBits {.raises: [PortClosedError, OSError].} = discard
+  proc stopBits*(port: SerialPort): StopBits {.raises: [PortClosedError, StopBitsUnknownError, OSError].} = discard
     ## Get the number of stop bits that the serial port operates with.
 
   proc `hardwareFlowControl=`*(port: SerialPort, enabled: bool) {.raises: [PortClosedError, OSError].} = discard
@@ -53,23 +53,26 @@ when defined(nimdoc):
   proc softwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OSError].} = discard
     ## Get whether XON?XOFF software flow control is enabled for the serial port.
 
-  proc write*(port: SerialPort, data: cstring) {.raises: [PortClosedError, OSError], tags: [WriteIOEffect].} = discard
+  proc write*(port: SerialPort, data: cstring, timeout: uint = 0) {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [WriteIOEffect].} = discard
     ## Write `data` to the serial port. This ensures that all of `data` is written.
 
-  proc write*(port: SerialPort, data: string) {.raises: [PortClosedError, OSError], tags: WriteIOEffect.} = discard
-    ## Write `data` to the serial port. This ensures that all of `data` is written.
-
-  proc read*(port: SerialPort, data: pointer, size: int, timeout: int = -1): int
-    {.raises: [PortClosedError, PortReadTimeoutError, OSError], tags: [ReadIOEffect].} = discard
+  proc read*(port: SerialPort, data: pointer, size: int, timeout: uint = 0): int
+    {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [ReadIOEffect].} = discard
     ## Read from the serial port into the buffer pointed to by `data`, with buffer length `size`.
     ##
     ## This will return the number of bytes received, as it does not guarantee that the buffer will be filled completely.
     ##
     ## The read will time out after `timeout` seconds if no data is received in that time.
-    ## To disable timeouts, pass `-1` a the timeout parameter. When timeouts are disabled, this will block until at least 1 byte of data is received.
+    ## To disable timeouts, pass `0` as the timeout parameter. When timeouts are disabled, this will block until at least 1 byte of data is received.
 elif defined(posix):
   include serialport/private/serial_posix
 elif defined(windows):
   include serialport/private/serial_windows
 else:
   {.error: "Serial port handling not implemented for your platform".}
+
+proc write*(port: SerialPort, data: string, timeout: uint = 0) {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [WriteIOEffect].} =
+  ## Write `data` to the serial port. This ensures that all of `data` is written.
+  ##
+  ## You can optionally set a timeout (in seconds) for the write operation by passing a non-zero `timeout` value.
+  port.write(data.cstring, timeout)

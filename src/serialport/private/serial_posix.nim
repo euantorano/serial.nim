@@ -1,4 +1,4 @@
-## POSIX implementation of serial port handling.
+# POSIX implementation of serial port handling.
 
 import termios, posix, os
 
@@ -54,7 +54,7 @@ proc setDataBits(options: var Termios, db: DataBits) =
   of DataBits.eight:
     options.c_cflag = options.c_cflag or CS8
 
-proc setParity(options: var Termios, parity: Parity) =
+proc setParity(options: var Termios, parity: Parity) {.raises: [ParityUnknownError].} =
   ## Set the parity on the given `Termios` instance.
   case parity
   of Parity.none, Parity.space:
@@ -64,6 +64,8 @@ proc setParity(options: var Termios, parity: Parity) =
   of Parity.even:
     options.c_cflag = options.c_cflag or PARENB
     options.c_cflag = options.c_cflag and (not PARODD)
+  else:
+    raise newException(ParityUnknownError, "Unknown parity: " & $parity)
 
 proc setStopBits(options: var Termios, sb: StopBits) =
   ## Set the number of stop bits on the given `Termios` instance.
@@ -90,7 +92,7 @@ proc setSoftwareFlowControl(options: var Termios, enabled: bool) =
 proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
     dataBits: DataBits = DataBits.eight, parity: Parity = Parity.none,
     stopBits: StopBits = StopBits.one, useHardwareFlowControl: bool = false,
-    useSoftwareFlowControl: bool = false): SerialPort {.raises: [InvalidPortNameError, OSError].} =
+    useSoftwareFlowControl: bool = false): SerialPort {.raises: [InvalidPortNameError, ParityUnknownError, OSError].} =
   ## Open the serial port with the given name.
   ##
   ## If the serial port at the given path is not found, a `InvalidPortNameError` will be raised.
@@ -193,7 +195,7 @@ proc dataBits*(port: SerialPort): DataBits {.raises: [PortClosedError, OSError].
   else:
     result = DataBits.five
 
-proc `parity=`*(port: SerialPort, parity: Parity) {.raises: [PortClosedError, OSError].} =
+proc `parity=`*(port: SerialPort, parity: Parity) {.raises: [PortClosedError, ParityUnknownError, OSError].} =
   ## Set the parity that the serial port operates with.
   checkPortIsNotClosed(port)
 
@@ -281,22 +283,38 @@ proc softwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OS
 
   result = (options.c_cflag and (IXON or IXOFF or IXANY)) == (IXON or IXOFF or IXANY)
 
-proc write*(port: SerialPort, data: cstring) {.raises: [PortClosedError, OSError], tags: [WriteIOEffect].} =
+proc write*(port: SerialPort, data: cstring, timeout: uint = 0) {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [WriteIOEffect].} =
   ## Write `data` to the serial port. This ensures that all of `data` is written.
   checkPortIsNotClosed(port)
 
   var
     totalWritten: int = 0
     numWritten: int
-  while totalWritten < len(data):
-    numWritten = write(port.handle, data[totalWritten].unsafeAddr, len(data) - totalWritten)
-    if numWritten == -1:
-      raiseOSError(osLastError())
-    inc(totalWritten, numWritten)
 
-proc write*(port: SerialPort, data: string) {.raises: [PortClosedError, OSError], tags: WriteIOEffect.} =
-  ## Write `data` to the serial port. This ensures that all of `data` is written.
-  port.write(data.cstring)
+  if timeout > 0'u:
+    var
+      selectSet: TFdSet
+      timer: Timeval
+    FD_ZERO(selectSet)
+    FD_SET(port.handle, selectSet)
+
+    while totalWritten < len(data):
+      let selected = select(cint(port.handle + 1), nil, addr selectSet, nil, addr timer)
+
+      case selected
+      of -1:
+        raiseOSError(osLastError())
+      of 0:
+        raise newException(PortTimeoutError, "Write timed out after " & $timeout & " seconds")
+      else:
+        numWritten = write(port.handle, data[totalWritten].unsafeAddr, len(data) - totalWritten)
+        inc(totalWritten, numWritten)
+  else:
+    while totalWritten < len(data):
+      numWritten = write(port.handle, data[totalWritten].unsafeAddr, len(data) - totalWritten)
+      if numWritten == -1:
+        raiseOSError(osLastError())
+      inc(totalWritten, numWritten)
 
 proc rawRead(handle: FileHandle, data: pointer, size: int): int {.inline, raises: [OSError], tags: [ReadIOEffect].} =
   ## Raw read form the given file handle, without any timeout.
@@ -304,24 +322,24 @@ proc rawRead(handle: FileHandle, data: pointer, size: int): int {.inline, raises
   if result == -1:
     raiseOSError(osLastError())
 
-proc read*(port: SerialPort, data: pointer, size: int, timeout: int = -1): int
-  {.raises: [PortClosedError, PortReadTimeoutError, OSError], tags: [ReadIOEffect].} =
+proc read*(port: SerialPort, data: pointer, size: int, timeout: uint = 0): int
+  {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [ReadIOEffect].} =
   ## Read from the serial port into the buffer pointed to by `data`, with buffer length `size`.
   ##
   ## This will return the number of bytes received, as it does not guarantee that the buffer will be filled completely.
   ##
   ## The read will time out after `timeout` seconds if no data is received in that time.
-  ## To disable timeouts, pass `-1` a the timeout parameter. When timeouts are disabled, this will block until at least 1 byte of data is received.
+  ## To disable timeouts, pass `0` as the timeout parameter. When timeouts are disabled, this will block until at least 1 byte of data is received.
   checkPortIsNotClosed(port)
 
-  if timeout > -1:
+  if timeout > 0'u:
     var
       selectSet: TFdSet
       timer: Timeval
     FD_ZERO(selectSet)
     FD_SET(port.handle, selectSet)
 
-    timer.tv_sec = timeout
+    timer.tv_sec = int(timeout)
 
     let selected = select(cint(port.handle + 1), addr selectSet, nil, nil, addr timer)
 
@@ -329,7 +347,7 @@ proc read*(port: SerialPort, data: pointer, size: int, timeout: int = -1): int
     of -1:
       raiseOSError(osLastError())
     of 0:
-      raise newException(PortReadTimeoutError, "Read timed out after " & $timeout & " seconds")
+      raise newException(PortTimeoutError, "Read timed out after " & $timeout & " seconds")
     else:
       result = rawRead(port.handle, data, size)
   else:

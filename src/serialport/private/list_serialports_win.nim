@@ -1,4 +1,4 @@
-## Windows specific code to list available serial ports using SetupDiGetClassDevs().
+# Windows specific code to list available serial ports using SetupDiGetClassDevs().
 
 import winlean, os, registry
 
@@ -62,7 +62,7 @@ iterator listSerialPorts*(): string {.raises:[OSError].} =
         # Open the registry key for the device
         let regKey: HKEY = SetupDiOpenDevRegKey(devInfoSet, addr devInfo, DICS_FLAG_GLOBAL, 0, DIREG_DEV, KEY_QUERY_VALUE)
 
-        if regKey != -1:
+        if regKey != HKEY(-1):
           # Then read the port name from the registry
           yield getUnicodeValue("", "PortName", regKey)
 

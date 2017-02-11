@@ -1,4 +1,4 @@
-## Common definitions shared between platform specific implementations.
+# Common definitions shared between platform specific implementations.
 
 when defined(posix):
   import termios
@@ -8,7 +8,7 @@ elif defined(windows):
 type
   Parity* {.pure.} = enum
     ## Allowable parities for the serial port.
-    none, odd, even, space
+    none, odd, even, space, mark
 
   BaudRate* {.pure.} = enum
     ## Serial baud rates.
@@ -31,10 +31,10 @@ type
 
   DataBits* {.pure.} = enum
     ## The standard length of data bits per byte for the serial port.
-    five,
-    six,
-    seven,
-    eight
+    five = 5,
+    six = 6,
+    seven = 7,
+    eight = 8
 
   StopBits* {.pure.} = enum
     ## The standard number of stopbits per byte for the serial port.
@@ -50,11 +50,10 @@ type
       oldPortSettings: Termios
     elif defined(windows):
       handle: HANDLE
+      readTimeoutSeconds: uint
+      writeTimeoutSeconds: uint
 
-  FlowControlSettings* = tuple[cts: bool, rts: bool]
-    ## Flow control settings for use with a serial port.
-
-  SerialPort* = ref SerialPortObj not nil
+  SerialPort* = ref SerialPortObj
     ## Represents a serial port.
 
   SerialPortError* = object of Exception
@@ -69,8 +68,14 @@ type
   PortReadError* = object of SerialPortError
     ## Raised when an error occurs whilst reading a serial port.
 
-  PortReadTimeoutError* = object of SerialPortError
-    ## Raised when reading from a serial port times out.
+  PortTimeoutError* = object of SerialPortError
+    ## Raised when an operation on a serial port times out.
+
+  ParityUnknownError* = object of SerialPortError
+    ## Raised when an unknown parity is being used.
+
+  StopBitsUnknownError* = object of SerialPortError
+    ## Raised when an unknown number of stop bits is being used.
 
 proc `$`*(port: Serialport): string = port.name
   ## Convert a port to a string, using the port's name.
