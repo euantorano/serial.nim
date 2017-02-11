@@ -12,6 +12,6 @@ A library to work with serial ports using pure Nim.
     - [X] Windows
 - [ ] Port listing to list available serial ports
     - [X] Windows, using `SetupDiGetClassDevs`
-    - [ ] Mac, using I/O Kit
+    - [X] Mac, using I/O Kit
     - [ ] Posix, by iteratng possible device files
 - [ ] High level `SerialPortStream` that complies with the `streams` API.

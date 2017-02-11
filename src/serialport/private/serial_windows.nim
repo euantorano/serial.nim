@@ -153,6 +153,7 @@ proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
   var serialParams: DCB
 
   if not GetCommState(h, addr serialParams):
+    discard closeHandle(h)
     raiseOSError(osLastError())
 
   setBaudRate(serialParams, baudRate)
@@ -163,6 +164,7 @@ proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
   setSoftwareFlowControl(serialParams, useSoftwareFlowControl)
 
   if not SetCommState(h, addr serialParams):
+    discard closeHandle(h)
     raiseOSError(osLastError())
 
   result = SerialPort(
@@ -170,8 +172,12 @@ proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
     handle: h
   )
 
-  setReadTimeout(result, 0)
-  setWriteTimeout(result, 0)
+  try:
+    setReadTimeout(result, 0)
+    setWriteTimeout(result, 0)
+  except:
+    discard closeHandle(h)
+    raise
 
 proc isClosed*(port: SerialPort): bool = port.handle == INVALID_HANDLE_VALUE
   ## Determine whether the given port is open or closed.
