@@ -73,7 +73,7 @@ proc getDeviceName(service: io_object_t): cstring =
 
     CFRelease(cfContainer)
 
-iterator listSerialPorts*(): string {.raises:[OSError].} =
+iterator listSerialPorts*(): string {.raises: [OSError].} =
   for service in GetIOServicesByType():
     let name = getDeviceName(service)
     if len(name) > 0:

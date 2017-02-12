@@ -90,8 +90,9 @@ for p in listSerialPorts():
 - [X] Port setting control - baud rate, stop bits, databits, parity
     - [X] Posix
     - [X] Windows
-- [ ] Port listing to list available serial ports
+- [X] Port listing to list available serial ports
     - [X] Windows, using `SetupDiGetClassDevs`
     - [X] Mac, using I/O Kit
-    - [ ] Posix, by iteratng possible device files
-- [ ] High level `SerialPortStream` that complies with the `streams` API.
+    - [X] Posix, by iteratng possible device files
+- [ ] High level `SerialPortStream` that complies with the `streams` API
+- [ ] Async API using `asyncdispatch`
