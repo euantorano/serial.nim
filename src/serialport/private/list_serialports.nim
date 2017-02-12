@@ -8,4 +8,4 @@ elif defined(windows):
 elif defined(macosx):
   include ./list_serialports_mac
 else:
-  {.error: "Unsupported OS".}
+  {.warning: "Unsupported OS".}
