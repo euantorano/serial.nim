@@ -14,7 +14,7 @@
 <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,500,600' rel='stylesheet' type='text/css'/>
 
 <!-- CSS -->
-<title>Module serialport</title>
+<title>Module libserialport</title>
 <style type="text/css" >
 /*
 Stylesheet for use with Docutils/rst2html.
@@ -1193,7 +1193,7 @@ function main() {
 <body onload="main()">
 <div class="document" id="documentId">
   <div class="container">
-    <h1 class="title">Module serialport</h1>
+    <h1 class="title">Module libserialport</h1>
     <div class="row">
   <div class="three columns">
   <div>
@@ -1317,9 +1317,9 @@ function main() {
 <dd>
 Allowable parities for the serial port.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/common.nim#L9"
+href="/tree/master/src/libserialport/private/common.nim#L9"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/common.nim#L9" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport/private/common.nim#L9" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="BaudRate"><a name="BaudRate"></a><pre><span class="Identifier">BaudRate</span> <span class="Other">=</span> <span class="Keyword">enum</span>
@@ -1329,9 +1329,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Serial baud rates.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/common.nim#L13"
+href="/tree/master/src/libserialport/private/common.nim#L13"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/common.nim#L13" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport/private/common.nim#L13" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="DataBits"><a name="DataBits"></a><pre><span class="Identifier">DataBits</span> <span class="Other">=</span> <span class="Keyword">enum</span>
@@ -1339,9 +1339,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 The standard length of data bits per byte for the serial port.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/common.nim#L32"
+href="/tree/master/src/libserialport/private/common.nim#L32"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/common.nim#L32" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport/private/common.nim#L32" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="StopBits"><a name="StopBits"></a><pre><span class="Identifier">StopBits</span> <span class="Other">=</span> <span class="Keyword">enum</span>
@@ -1349,18 +1349,18 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 The standard number of stopbits per byte for the serial port.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/common.nim#L39"
+href="/tree/master/src/libserialport/private/common.nim#L39"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/common.nim#L39" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport/private/common.nim#L39" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="SerialPort"><a name="SerialPort"></a><pre><span class="Identifier">SerialPort</span> <span class="Other">=</span> <span class="Keyword">ref</span> <span class="Identifier">SerialPortObj</span></pre></dt>
 <dd>
 Represents a serial port.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/common.nim#L56"
+href="/tree/master/src/libserialport/private/common.nim#L56"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/common.nim#L56" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport/private/common.nim#L56" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="SerialPortError"><a name="SerialPortError"></a><pre><span class="Identifier">SerialPortError</span> <span class="Other">=</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <span class="Identifier">Exception</span>
@@ -1368,9 +1368,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Base error type for errors raised by the serialport module.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/common.nim#L59"
+href="/tree/master/src/libserialport/private/common.nim#L59"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/common.nim#L59" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport/private/common.nim#L59" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="InvalidPortNameError"><a name="InvalidPortNameError"></a><pre><span class="Identifier">InvalidPortNameError</span> <span class="Other">=</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <span class="Identifier">SerialPortError</span>
@@ -1378,9 +1378,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Raised if an invalid port name is provided when opening a serial port with <cite>openSerialPort</cite>.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/common.nim#L62"
+href="/tree/master/src/libserialport/private/common.nim#L62"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/common.nim#L62" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport/private/common.nim#L62" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="PortClosedError"><a name="PortClosedError"></a><pre><span class="Identifier">PortClosedError</span> <span class="Other">=</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <span class="Identifier">SerialPortError</span>
@@ -1388,9 +1388,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Raised when an operation is attempted on a port that is closed.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/common.nim#L65"
+href="/tree/master/src/libserialport/private/common.nim#L65"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/common.nim#L65" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport/private/common.nim#L65" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="PortReadError"><a name="PortReadError"></a><pre><span class="Identifier">PortReadError</span> <span class="Other">=</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <span class="Identifier">SerialPortError</span>
@@ -1398,9 +1398,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Raised when an error occurs whilst reading a serial port.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/common.nim#L68"
+href="/tree/master/src/libserialport/private/common.nim#L68"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/common.nim#L68" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport/private/common.nim#L68" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="PortTimeoutError"><a name="PortTimeoutError"></a><pre><span class="Identifier">PortTimeoutError</span> <span class="Other">=</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <span class="Identifier">SerialPortError</span>
@@ -1408,9 +1408,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Raised when an operation on a serial port times out.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/common.nim#L71"
+href="/tree/master/src/libserialport/private/common.nim#L71"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/common.nim#L71" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport/private/common.nim#L71" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="ParityUnknownError"><a name="ParityUnknownError"></a><pre><span class="Identifier">ParityUnknownError</span> <span class="Other">=</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <span class="Identifier">SerialPortError</span>
@@ -1418,9 +1418,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Raised when an unknown parity is being used.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/common.nim#L74"
+href="/tree/master/src/libserialport/private/common.nim#L74"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/common.nim#L74" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport/private/common.nim#L74" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="StopBitsUnknownError"><a name="StopBitsUnknownError"></a><pre><span class="Identifier">StopBitsUnknownError</span> <span class="Other">=</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <span class="Identifier">SerialPortError</span>
@@ -1428,9 +1428,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Raised when an unknown number of stop bits is being used.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/common.nim#L77"
+href="/tree/master/src/libserialport/private/common.nim#L77"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/common.nim#L77" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport/private/common.nim#L77" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 
@@ -1442,9 +1442,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Convert a port to a string, using the port's name.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/common.nim#L80"
+href="/tree/master/src/libserialport/private/common.nim#L80"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/common.nim#L80" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport/private/common.nim#L80" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="openSerialPort"><a name="openSerialPort,string,BaudRate,DataBits,Parity,StopBits,bool,bool"></a><pre><span class="Keyword">proc</span> <span class="Identifier">openSerialPort</span><span class="Other">(</span><span class="Identifier">name</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">baudRate</span><span class="Other">:</span> <span class="Identifier">BaudRate</span> <span class="Other">=</span> <span class="Identifier">BaudRate</span><span class="Other">.</span><span class="Identifier">BR9600</span><span class="Other">;</span>
@@ -1458,27 +1458,27 @@ class="link-seesrc" target="_blank">Source</a>
 <p>If the serial port at the given path is not found, a <cite>InvalidPortNameError</cite> will be raised.</p>
 
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L6"
+href="/tree/master/src/libserialport.nim#L6"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L6" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L6" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="isClosed"><a name="isClosed,SerialPort"></a><pre><span class="Keyword">proc</span> <span class="Identifier">isClosed</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Determine whether the given port is open or closed.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L14"
+href="/tree/master/src/libserialport.nim#L14"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L14" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L14" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="close"><a name="close,SerialPort"></a><pre><span class="Keyword">proc</span> <span class="Identifier">close</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">)</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Close the seial port, restoring its original settings.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L17"
+href="/tree/master/src/libserialport.nim#L17"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L17" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L17" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="baudRate="><a name="baudRate=,SerialPort,BaudRate"></a><pre><span class="Keyword">proc</span> <span class="Identifier">baudRate=</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">;</span> <span class="Identifier">br</span><span class="Other">:</span> <span class="Identifier">BaudRate</span><span class="Other">)</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">PortClosedError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span>
@@ -1486,9 +1486,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Set the baud rate that the serial port operates at.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L20"
+href="/tree/master/src/libserialport.nim#L20"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L20" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L20" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="baudRate"><a name="baudRate,SerialPort"></a><pre><span class="Keyword">proc</span> <span class="Identifier">baudRate</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">BaudRate</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">PortClosedError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span>
@@ -1496,9 +1496,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Get the baud rate that the serial port is currently operating at.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L23"
+href="/tree/master/src/libserialport.nim#L23"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L23" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L23" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="dataBits="><a name="dataBits=,SerialPort,DataBits"></a><pre><span class="Keyword">proc</span> <span class="Identifier">dataBits=</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">;</span> <span class="Identifier">db</span><span class="Other">:</span> <span class="Identifier">DataBits</span><span class="Other">)</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">PortClosedError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span>
@@ -1506,9 +1506,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Set the number of data bits that the serial port operates with.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L26"
+href="/tree/master/src/libserialport.nim#L26"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L26" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L26" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="dataBits"><a name="dataBits,SerialPort"></a><pre><span class="Keyword">proc</span> <span class="Identifier">dataBits</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">DataBits</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">PortClosedError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span>
@@ -1516,9 +1516,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Get the number of data bits that the serial port operates with.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L29"
+href="/tree/master/src/libserialport.nim#L29"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L29" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L29" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="parity="><a name="parity=,SerialPort,Parity"></a><pre><span class="Keyword">proc</span> <span class="Identifier">parity=</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">;</span> <span class="Identifier">parity</span><span class="Other">:</span> <span class="Identifier">Parity</span><span class="Other">)</span> <span class="Other pragmabegin">{.</span><div class="pragma">
@@ -1526,9 +1526,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Set the parity that the serial port operates with.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L32"
+href="/tree/master/src/libserialport.nim#L32"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L32" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L32" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="parity"><a name="parity,SerialPort"></a><pre><span class="Keyword">proc</span> <span class="Identifier">parity</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Parity</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">PortClosedError</span><span class="Other">,</span> <span class="Identifier">ParityUnknownError</span><span class="Other">,</span>
@@ -1536,9 +1536,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Get the parity that the serial port operates with.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L35"
+href="/tree/master/src/libserialport.nim#L35"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L35" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L35" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="stopBits="><a name="stopBits=,SerialPort,StopBits"></a><pre><span class="Keyword">proc</span> <span class="Identifier">stopBits=</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">;</span> <span class="Identifier">sb</span><span class="Other">:</span> <span class="Identifier">StopBits</span><span class="Other">)</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">PortClosedError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span>
@@ -1546,9 +1546,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Set the number of stop bits that the serial port operates with.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L38"
+href="/tree/master/src/libserialport.nim#L38"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L38" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L38" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="stopBits"><a name="stopBits,SerialPort"></a><pre><span class="Keyword">proc</span> <span class="Identifier">stopBits</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">StopBits</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">PortClosedError</span><span class="Other">,</span>
@@ -1556,9 +1556,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Get the number of stop bits that the serial port operates with.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L41"
+href="/tree/master/src/libserialport.nim#L41"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L41" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L41" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="hardwareFlowControl="><a name="hardwareFlowControl=,SerialPort,bool"></a><pre><span class="Keyword">proc</span> <span class="Identifier">hardwareFlowControl=</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">;</span> <span class="Identifier">enabled</span><span class="Other">:</span> <span class="Identifier">bool</span><span class="Other">)</span> <span class="Other pragmabegin">{.</span><div class="pragma">
@@ -1566,9 +1566,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Set whether to use RTS and CTS flow control for sending/receiving data with the serial port.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L44"
+href="/tree/master/src/libserialport.nim#L44"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L44" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L44" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="hardwareFlowControl"><a name="hardwareFlowControl,SerialPort"></a><pre><span class="Keyword">proc</span> <span class="Identifier">hardwareFlowControl</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma">
@@ -1576,9 +1576,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Get whether RTS/CTS is enabled for the serial port.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L47"
+href="/tree/master/src/libserialport.nim#L47"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L47" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L47" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="softwareFlowControl="><a name="softwareFlowControl=,SerialPort,bool"></a><pre><span class="Keyword">proc</span> <span class="Identifier">softwareFlowControl=</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">;</span> <span class="Identifier">enabled</span><span class="Other">:</span> <span class="Identifier">bool</span><span class="Other">)</span> <span class="Other pragmabegin">{.</span><div class="pragma">
@@ -1586,9 +1586,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Set whether to use XON/XOFF software flow control for sending/receiving data with the serial port.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L50"
+href="/tree/master/src/libserialport.nim#L50"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L50" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L50" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="softwareFlowControl"><a name="softwareFlowControl,SerialPort"></a><pre><span class="Keyword">proc</span> <span class="Identifier">softwareFlowControl</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma">
@@ -1596,9 +1596,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Get whether XON?XOFF software flow control is enabled for the serial port.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L53"
+href="/tree/master/src/libserialport.nim#L53"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L53" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L53" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="write"><a name="write,SerialPort,pointer,int,uint"></a><pre><span class="Keyword">proc</span> <span class="Identifier">write</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">;</span> <span class="Identifier">data</span><span class="Other">:</span> <span class="Identifier">pointer</span><span class="Other">;</span> <span class="Identifier">length</span><span class="Other">:</span> <span class="Identifier">int</span><span class="Other">;</span> <span class="Identifier">timeout</span><span class="Other">:</span> <span class="Identifier">uint</span> <span class="Other">=</span> <span class="DecNumber">0</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">int</span> <span class="Other pragmabegin">{.</span><div class="pragma">
@@ -1606,9 +1606,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Write the data in the buffer pointed to by <cite>data</cite> with the given <cite>length</cite> to the serial port.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L56"
+href="/tree/master/src/libserialport.nim#L56"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L56" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L56" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="write"><a name="write,SerialPort,cstring,uint"></a><pre><span class="Keyword">proc</span> <span class="Identifier">write</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">;</span> <span class="Identifier">data</span><span class="Other">:</span> <span class="Identifier">cstring</span><span class="Other">;</span> <span class="Identifier">timeout</span><span class="Other">:</span> <span class="Identifier">uint</span> <span class="Other">=</span> <span class="DecNumber">0</span><span class="Other">)</span> <span class="Other pragmabegin">{.</span><div class="pragma">
@@ -1616,9 +1616,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Write <cite>data</cite> to the serial port. This ensures that all of <cite>data</cite> is written.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L59"
+href="/tree/master/src/libserialport.nim#L59"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L59" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L59" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="read"><a name="read,SerialPort,pointer,int,uint"></a><pre><span class="Keyword">proc</span> <span class="Identifier">read</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">;</span> <span class="Identifier">data</span><span class="Other">:</span> <span class="Identifier">pointer</span><span class="Other">;</span> <span class="Identifier">size</span><span class="Other">:</span> <span class="Identifier">int</span><span class="Other">;</span> <span class="Identifier">timeout</span><span class="Other">:</span> <span class="Identifier">uint</span> <span class="Other">=</span> <span class="DecNumber">0</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">int</span> <span class="Other pragmabegin">{.</span><div class="pragma">
@@ -1629,9 +1629,9 @@ class="link-seesrc" target="_blank">Source</a>
 <p>The read will time out after <cite>timeout</cite> seconds if no data is received in that time. To disable timeouts, pass <cite>0</cite> as the timeout parameter. When timeouts are disabled, this will block until at least 1 byte of data is received.</p>
 
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L62"
+href="/tree/master/src/libserialport.nim#L62"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L62" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L62" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="write"><a name="write,SerialPort,string,uint"></a><pre><span class="Keyword">proc</span> <span class="Identifier">write</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">;</span> <span class="Identifier">data</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">timeout</span><span class="Other">:</span> <span class="Identifier">uint</span> <span class="Other">=</span> <span class="DecNumber">0</span><span class="Other">)</span> <span class="Other pragmabegin">{.</span><div class="pragma">
@@ -1641,9 +1641,9 @@ class="link-seesrc" target="_blank">Source</a>
 <p>You can optionally set a timeout (in seconds) for the write operation by passing a non-zero <cite>timeout</cite> value.</p>
 
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport.nim#L77"
+href="/tree/master/src/libserialport.nim#L77"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport.nim#L77" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport.nim#L77" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 
@@ -1655,9 +1655,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Iterate through a list of the available serial port names on the system.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/list_serialports.nim#L4"
+href="/tree/master/src/libserialport/private/list_serialports.nim#L4"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/list_serialports.nim#L4" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport/private/list_serialports.nim#L4" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 
@@ -1670,7 +1670,7 @@ class="link-seesrc" target="_blank">Source</a>
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small>Made with Nim. Generated: 2017-02-12 10:13:10 UTC</small>
+        <small>Made with Nim. Generated: 2017-02-12 16:32:43 UTC</small>
       </div>
     </div>
   </div>

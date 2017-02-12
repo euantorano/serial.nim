@@ -1,11 +1,11 @@
-# serialport.nim
+# libserialport.nim
 
 A library to work with serial ports using pure Nim.
 
 ## Installation
 
 ```
-nimble install serialport
+nimble install libserialport
 ```
 
 ## Usage
@@ -13,12 +13,13 @@ nimble install serialport
 ### Reading from a serial port, into a pre-defined buffer:
 
 ```nim
-import serialport
+import libserialport
 
 let port = openSerialPort("COM3",
     baudRate=BaudRate.BR9600, dataBits=DataBits.eight,
     stopBits=StopBits.one, parity=Parity.none,
     useHardwareFlowControl=true, useSoftwareFlowControl=false)
+defer: port.close()
 
 ## The baud rate, data bits, stop bits and parity default to 9600, 8, 1 and none - in that order
 
@@ -44,12 +45,13 @@ echo "Read ", numRead, " bytes from the serial port: ", readBuffer
 ### Writing to a serial port:
 
 ```nim
-import serialport
+import libserialport
 
 let port = openSerialPort("COM3",
     baudRate=BaudRate.BR9600, dataBits=DataBits.eight,
     stopBits=StopBits.one, parity=Parity.none,
     useHardwareFlowControl=true, useSoftwareFlowControl=false)
+defer: port.close()
 
 ## The baud rate, data bits, stop bits and parity default to 9600, 8, 1 and none - in that order
 
@@ -76,7 +78,7 @@ port.write(newDataToSend, timeout=5) # Wait for 5 seconds. If the data isn't tra
 ### Listing serial ports available on the system
 
 ```nim
-import serialport
+import libserialport
 
 for p in listSerialPorts():
   echo "Found serial port: ", p

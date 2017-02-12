@@ -12,4 +12,4 @@ srcDir = "src"
 requires "nim >= 0.15.2"
 
 task docs, "Build documentation":
-  exec "nim doc2 -o:docs/serialport.html src/serialport.nim"
+  exec "nim doc2 -o:docs/libserialport.html src/libserialport.nim"

@@ -1,6 +1,6 @@
 ## A library to work with serial ports using pure Nim.
 
-include serialport/private/list_serialports, serialport/private/common
+include libserialport/private/list_serialports, libserialport/private/common
 
 when defined(nimdoc):
   proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,

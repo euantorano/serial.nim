@@ -1,4 +1,4 @@
-import serialport, os
+import libserialport, os
 
 const
   writePort: string = "/dev/cu.usbserial-FTZ9WDJA"

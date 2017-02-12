@@ -1,4 +1,4 @@
-import serialport
+import libserialport
 
 when isMainModule:
   proc main() =
