@@ -2,12 +2,7 @@
 
 import termios, posix, os
 
-when not defined(linux):
-  var
-    CRTS_IFLOW {.importc, header: "<termios.h>".}: cuint
-    CCTS_OFLOW {.importc, header: "<termios.h>".}: cuint
-else:
-  var CRTSCTS {.importc, header: "<termios.h>".}: cuint
+var CRTSCTS {.importc, header: "<termios.h>".}: cuint
 
 proc cfmakeraw*(termios: ptr Termios): void {.importc: "cfmakeraw",
     header: "<termios.h>".}
@@ -80,16 +75,10 @@ proc setStopBits(options: var Termios, sb: StopBits) =
 
 proc setHardwareFlowControl(options: var Termios, enabled: bool) =
   ## Set whether to use CTS/RTS flow control.
-  when not defined(linux):
-    if enabled:
-      options.c_cflag = options.c_cflag or (CRTS_IFLOW or CCTS_OFLOW)
-    else:
-      options.c_cflag = options.c_cflag and (not (CRTS_IFLOW or CCTS_OFLOW))
+  if enabled:
+    options.c_cflag = options.c_cflag or CRTSCTS
   else:
-    if enabled:
-      options.c_cflag = options.c_cflag or CRTSCTS
-    else:
-      options.c_cflag = options.c_cflag and (not CRTSCTS)
+    options.c_cflag = options.c_cflag and (not CRTSCTS)
 
 proc setSoftwareFlowControl(options: var Termios, enabled: bool) =
   ## Set whether to use XON/XOFF software flow control.
@@ -270,10 +259,7 @@ proc hardwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OS
   var options: Termios
   checkCallResult tcGetAttr(port.handle, addr options)
 
-  when not defined(linux):
-    result = (options.c_cflag and (CRTS_IFLOW or CCTS_OFLOW)) == (CRTS_IFLOW or CCTS_OFLOW)
-  else:
-    result = (options.c_cflag and CRTSCTS) == CRTSCTS
+  result = (options.c_cflag and CRTSCTS) == CRTSCTS
 
 proc `softwareFlowControl=`*(port: SerialPort, enabled: bool) {.raises: [PortClosedError, OSError].} =
   ## Set whether to use XON/XOFF software flow control for sending/receiving data with the serial port.

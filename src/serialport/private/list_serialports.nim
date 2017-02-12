@@ -7,5 +7,7 @@ elif defined(windows):
   include ./list_serialports_win
 elif defined(macosx):
   include ./list_serialports_mac
+elif defined(linux):
+  include ./list_serialports_linux
 else:
   {.warning: "Unsupported OS".}
