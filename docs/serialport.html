@@ -1209,31 +1209,9 @@ function main() {
   </div>
   <ul class="simple simple-toc" id="toc-list">
 <li>
-  <a class="reference reference-toplevel" href="#6" id="56">Imports</a>
-  <ul class="simple simple-toc-section">
-    
-  </ul>
-</li>
-<li>
   <a class="reference reference-toplevel" href="#7" id="57">Types</a>
   <ul class="simple simple-toc-section">
-      <li><a class="reference" href="#kern_return_t"
-    title="kern_return_t = int32"><wbr />kern_<wbr />return_<wbr />t<span class="attachedType" style="visibility:hidden"></span></a></li>
-  <li><a class="reference" href="#mach_port_t"
-    title="mach_port_t = uint32"><wbr />mach_<wbr />port_<wbr />t<span class="attachedType" style="visibility:hidden"></span></a></li>
-  <li><a class="reference" href="#io_object_t"
-    title="io_object_t = mach_port_t"><wbr />io_<wbr />object_<wbr />t<span class="attachedType" style="visibility:hidden"></span></a></li>
-  <li><a class="reference" href="#io_iterator_t"
-    title="io_iterator_t = io_object_t"><wbr />io_<wbr />iterator_<wbr />t<span class="attachedType" style="visibility:hidden"></span></a></li>
-  <li><a class="reference" href="#CFAllocatorRef"
-    title="CFAllocatorRef = pointer"><wbr />CFAllocator<wbr />Ref<span class="attachedType" style="visibility:hidden"></span></a></li>
-  <li><a class="reference" href="#CFStringEncoding"
-    title="CFStringEncoding = uint32"><wbr />CFString<wbr />Encoding<span class="attachedType" style="visibility:hidden"></span></a></li>
-  <li><a class="reference" href="#IOOptionBits"
-    title="IOOptionBits = uint32"><wbr />IOOption<wbr />Bits<span class="attachedType" style="visibility:hidden"></span></a></li>
-  <li><a class="reference" href="#CFTypeRef"
-    title="CFTypeRef = pointer"><wbr />CFType<wbr />Ref<span class="attachedType" style="visibility:hidden"></span></a></li>
-  <li><a class="reference" href="#Parity"
+      <li><a class="reference" href="#Parity"
     title="Parity = enum
   none, odd, even, space, mark"><wbr />Parity<span class="attachedType" style="visibility:hidden"></span></a></li>
   <li><a class="reference" href="#BaudRate"
@@ -1331,86 +1309,9 @@ function main() {
   <div class="nine columns" id="content">
   <div id="tocRoot"></div>
   <p class="module-desc">A library to work with serial ports using pure Nim.</p>
-  <div class="section" id="6">
-<h1><a class="toc-backref" href="#6">Imports</a></h1>
-<dl class="item">
-<a class="reference external" href="os.html">os</a>
-</dl></div>
-<div class="section" id="7">
+  <div class="section" id="7">
 <h1><a class="toc-backref" href="#7">Types</a></h1>
 <dl class="item">
-<dt id="kern_return_t"><a name="kern_return_t"></a><pre><span class="Identifier">kern_return_t</span> <span class="Other">=</span> <span class="Identifier">int32</span></pre></dt>
-<dd>
-
-&nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/list_serialports_mac.nim#L8"
-class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/list_serialports_mac.nim#L8" class="link-seesrc" target="_blank" >Edit</a>
-
-</dd>
-<dt id="mach_port_t"><a name="mach_port_t"></a><pre><span class="Identifier">mach_port_t</span> <span class="Other">=</span> <span class="Identifier">uint32</span></pre></dt>
-<dd>
-
-&nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/list_serialports_mac.nim#L9"
-class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/list_serialports_mac.nim#L9" class="link-seesrc" target="_blank" >Edit</a>
-
-</dd>
-<dt id="io_object_t"><a name="io_object_t"></a><pre><span class="Identifier">io_object_t</span> <span class="Other">=</span> <span class="Identifier">mach_port_t</span></pre></dt>
-<dd>
-
-&nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/list_serialports_mac.nim#L10"
-class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/list_serialports_mac.nim#L10" class="link-seesrc" target="_blank" >Edit</a>
-
-</dd>
-<dt id="io_iterator_t"><a name="io_iterator_t"></a><pre><span class="Identifier">io_iterator_t</span> <span class="Other">=</span> <span class="Identifier">io_object_t</span></pre></dt>
-<dd>
-
-&nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/list_serialports_mac.nim#L11"
-class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/list_serialports_mac.nim#L11" class="link-seesrc" target="_blank" >Edit</a>
-
-</dd>
-<dt id="CFAllocatorRef"><a name="CFAllocatorRef"></a><pre><span class="Identifier">CFAllocatorRef</span> <span class="Other">=</span> <span class="Identifier">pointer</span></pre></dt>
-<dd>
-
-&nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/list_serialports_mac.nim#L12"
-class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/list_serialports_mac.nim#L12" class="link-seesrc" target="_blank" >Edit</a>
-
-</dd>
-<dt id="CFStringEncoding"><a name="CFStringEncoding"></a><pre><span class="Identifier">CFStringEncoding</span> <span class="Other">=</span> <span class="Identifier">uint32</span></pre></dt>
-<dd>
-
-&nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/list_serialports_mac.nim#L13"
-class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/list_serialports_mac.nim#L13" class="link-seesrc" target="_blank" >Edit</a>
-
-</dd>
-<dt id="IOOptionBits"><a name="IOOptionBits"></a><pre><span class="Identifier">IOOptionBits</span> <span class="Other">=</span> <span class="Identifier">uint32</span></pre></dt>
-<dd>
-
-&nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/list_serialports_mac.nim#L15"
-class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/list_serialports_mac.nim#L15" class="link-seesrc" target="_blank" >Edit</a>
-
-</dd>
-<dt id="CFTypeRef"><a name="CFTypeRef"></a><pre><span class="Identifier">CFTypeRef</span> <span class="Other">=</span> <span class="Identifier">pointer</span></pre></dt>
-<dd>
-
-&nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/list_serialports_mac.nim#L16"
-class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/list_serialports_mac.nim#L16" class="link-seesrc" target="_blank" >Edit</a>
-
-</dd>
 <dt id="Parity"><a name="Parity"></a><pre><span class="Identifier">Parity</span> <span class="Other">=</span> <span class="Keyword">enum</span>
   <span class="Identifier">none</span><span class="Other">,</span> <span class="Identifier">odd</span><span class="Other">,</span> <span class="Identifier">even</span><span class="Other">,</span> <span class="Identifier">space</span><span class="Other">,</span> <span class="Identifier">mark</span></pre></dt>
 <dd>
@@ -1752,11 +1653,11 @@ class="link-seesrc" target="_blank">Source</a>
 <dl class="item">
 <dt id="listSerialPorts"><a name="listSerialPorts.i,"></a><pre><span class="Keyword">iterator</span> <span class="Identifier">listSerialPorts</span><span class="Other">(</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
-
+Iterate through a list of the available serial port names on the system.
 &nbsp;&nbsp;<a
-href="/tree/master/src/serialport/private/list_serialports_mac.nim#L76"
+href="/tree/master/src/serialport/private/list_serialports.nim#L4"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/serialport/private/list_serialports_mac.nim#L76" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/serialport/private/list_serialports.nim#L4" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 
@@ -1769,7 +1670,7 @@ class="link-seesrc" target="_blank">Source</a>
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small>Made with Nim. Generated: 2017-02-11 23:15:57 UTC</small>
+        <small>Made with Nim. Generated: 2017-02-12 10:13:10 UTC</small>
       </div>
     </div>
   </div>
