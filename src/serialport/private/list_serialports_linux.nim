@@ -8,24 +8,17 @@ proc checkPath(path: string): bool =
   let fileName = extractFilename(path)
   let fullDevicePath = "/sys/class/tty" / filename / "device"
 
-  var devicePath: string = "",
-    subsystem: string = ""
+  var subsystem: string = ""
 
-  if existsFile(fullDevicePath):
-    devicePath = expandFilename(fullDevicePath)
-    subsystem = extractFilename(expandFilename("/sys/class/tty" / filename / "subsystem"))
-  else:
-    devicePath = ""
+  if symlinkExists(fullDevicePath):
+    let devicePath = expandFilename(fullDevicePath)
+    subsystem = extractFilename(expandFilename(devicePath / "subsystem"))
 
-  if subsystem != "platform":
-    result = true
-
-  echo "Got subsystem '", subsystem, "' device path: ", devicePath, " for file: ", path
-
+    if subsystem != "platform":
+      result = true
 
 iterator getPortsForPath(path: string): string {.raises: [OSError].} =
   for f in walkPattern(path):
-    echo "Path: ", f
     if checkPath(f):
       yield f
 
