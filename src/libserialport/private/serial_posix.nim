@@ -32,9 +32,44 @@ proc openPort(path: string): FileHandle {.raises: [OSError].} =
     discard close(result)
     raiseOSError(osLastError())
 
+proc convertBaudRate(br: BaudRate): Speed =
+  case br
+  of BR0:
+    result = B0
+  of BR50:
+    result = B50
+  of BR75:
+    result = B75
+  of BR110:
+    result = B110
+  of BR134:
+    result = B134
+  of BR150:
+    result = B150
+  of BR200:
+    result = B200
+  of BR300:
+    result = B300
+  of BR600:
+    result = B600
+  of BR1200:
+    result = B1200
+  of BR1800:
+    result = B1800
+  of BR2400:
+    result = B2400
+  of BR4800:
+    result = B4800
+  of BR9600:
+    result = B9600
+  of BR19200:
+    result = B19200
+  of BR38400:
+    result = B38400
+
 proc setBaudRate(options: ptr Termios, br: BaudRate) {.raises: [OSError].} =
   ## Set the baud rate on the given `Termios` instance.
-  let speed = Speed(br)
+  let speed = convertBaudRate(br)
   checkCallResult cfSetIspeed(options, speed)
   checkCallResult cfSetOspeed(options, speed)
 

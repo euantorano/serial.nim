@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.1.0"
+version       = "0.1.1"
 author        = "Euan T"
 description   = "A library to operate serial ports using pure Nim."
 license       = "BSD3"
