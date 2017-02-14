@@ -20,7 +20,7 @@ when defined(nimdoc):
   proc `baudRate=`*(port: SerialPort, br: BaudRate) {.raises: [PortClosedError, OSError].} = discard
     ## Set the baud rate that the serial port operates at.
 
-  proc baudRate*(port: SerialPort): BaudRate {.raises: [PortClosedError, OSError].} = discard
+  proc baudRate*(port: SerialPort): BaudRate {.raises: [PortClosedError, BaudRateUnknownError, OSError].} = discard
     ## Get the baud rate that the serial port is currently operating at.
 
   proc `dataBits=`*(port: SerialPort, db: DataBits) {.raises: [PortClosedError, OSError].} = discard

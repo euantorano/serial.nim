@@ -1241,6 +1241,8 @@ function main() {
     title="ParityUnknownError = object of SerialPortError"><wbr />Parity<wbr />Unknown<wbr />Error<span class="attachedType" style="visibility:hidden"></span></a></li>
   <li><a class="reference" href="#StopBitsUnknownError"
     title="StopBitsUnknownError = object of SerialPortError"><wbr />Stop<wbr />Bits<wbr />Unknown<wbr />Error<span class="attachedType" style="visibility:hidden"></span></a></li>
+  <li><a class="reference" href="#BaudRateUnknownError"
+    title="BaudRateUnknownError = object of SerialPortError"><wbr />Baud<wbr />Rate<wbr />Unknown<wbr />Error<span class="attachedType" style="visibility:hidden"></span></a></li>
 
   </ul>
 </li>
@@ -1433,6 +1435,16 @@ class="link-seesrc" target="_blank">Source</a>
 <a href="/edit/devel/src/libserialport/private/common.nim#L77" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
+<dt id="BaudRateUnknownError"><a name="BaudRateUnknownError"></a><pre><span class="Identifier">BaudRateUnknownError</span> <span class="Other">=</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <span class="Identifier">SerialPortError</span>
+  </pre></dt>
+<dd>
+Raised when an unknown baud rate is being used.
+&nbsp;&nbsp;<a
+href="/tree/master/src/libserialport/private/common.nim#L80"
+class="link-seesrc" target="_blank">Source</a>
+<a href="/edit/devel/src/libserialport/private/common.nim#L80" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
 
 </dl></div>
 <div class="section" id="12">
@@ -1442,9 +1454,9 @@ class="link-seesrc" target="_blank">Source</a>
 <dd>
 Convert a port to a string, using the port's name.
 &nbsp;&nbsp;<a
-href="/tree/master/src/libserialport/private/common.nim#L80"
+href="/tree/master/src/libserialport/private/common.nim#L83"
 class="link-seesrc" target="_blank">Source</a>
-<a href="/edit/devel/src/libserialport/private/common.nim#L80" class="link-seesrc" target="_blank" >Edit</a>
+<a href="/edit/devel/src/libserialport/private/common.nim#L83" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <dt id="openSerialPort"><a name="openSerialPort,string,BaudRate,DataBits,Parity,StopBits,bool,bool"></a><pre><span class="Keyword">proc</span> <span class="Identifier">openSerialPort</span><span class="Other">(</span><span class="Identifier">name</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">;</span> <span class="Identifier">baudRate</span><span class="Other">:</span> <span class="Identifier">BaudRate</span> <span class="Other">=</span> <span class="Identifier">BaudRate</span><span class="Other">.</span><span class="Identifier">BR9600</span><span class="Other">;</span>
@@ -1491,8 +1503,8 @@ class="link-seesrc" target="_blank">Source</a>
 <a href="/edit/devel/src/libserialport.nim#L20" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
-<dt id="baudRate"><a name="baudRate,SerialPort"></a><pre><span class="Keyword">proc</span> <span class="Identifier">baudRate</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">BaudRate</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">PortClosedError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span>
-                                        <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dt id="baudRate"><a name="baudRate,SerialPort"></a><pre><span class="Keyword">proc</span> <span class="Identifier">baudRate</span><span class="Other">(</span><span class="Identifier">port</span><span class="Other">:</span> <span class="Identifier">SerialPort</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">BaudRate</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">PortClosedError</span><span class="Other">,</span>
+    <span class="Identifier">BaudRateUnknownError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Get the baud rate that the serial port is currently operating at.
 &nbsp;&nbsp;<a
@@ -1670,7 +1682,7 @@ class="link-seesrc" target="_blank">Source</a>
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small>Made with Nim. Generated: 2017-02-12 16:32:43 UTC</small>
+        <small>Made with Nim. Generated: 2017-02-14 19:35:47 UTC</small>
       </div>
     </div>
   </div>

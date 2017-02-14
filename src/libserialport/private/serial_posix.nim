@@ -139,7 +139,7 @@ proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
     discard close(h)
     raiseOSError(osLastError())
 
-  var newSettings: Termios
+  var newSettings: Termios = oldPortSettings
 
   cfmakeraw(addr newSettings)
   newSettings.c_cc[VMIN] = cuchar(1)
@@ -192,14 +192,48 @@ proc `baudRate=`*(port: SerialPort, br: BaudRate) {.raises: [PortClosedError, OS
 
   checkCallResult tcSetAttr(port.handle, TCSANOW, addr options)
 
-proc baudRate*(port: SerialPort): BaudRate {.raises: [PortClosedError, OSError].} =
+proc baudRate*(port: SerialPort): BaudRate {.raises: [PortClosedError, BaudRateUnknownError, OSError].} =
   ## Get the baud rate that the serial port is currently operating at.
   checkPortIsNotClosed(port)
 
   var options: Termios
   checkCallResult tcGetAttr(port.handle, addr options)
   let speed: Speed = cfGetOspeed(addr options)
-  result = BaudRate(speed)
+
+  if speed == B0:
+    result = BaudRate.BR0
+  elif speed == B50:
+    result = BaudRate.BR50
+  elif speed == B75:
+    result = BaudRate.BR75
+  elif speed == B110:
+    result = Baudrate.BR110
+  elif speed == B134:
+    result = Baudrate.BR134
+  elif speed == B150:
+    result = BaudRate.BR150
+  elif speed == B200:
+    result = Baudrate.BR200
+  elif speed == B300:
+    result = Baudrate.BR300
+  elif speed == B600:
+    result = Baudrate.BR600
+  elif speed == B1200:
+    result = BaudRate.BR1200
+  elif speed == B1800:
+    result = BaudRate.BR1800
+  elif speed == B2400:
+    result = BaudRate.BR2400
+  elif speed == B4800:
+    result = BaudRate.BR4800
+  elif speed == B9600:
+    result = BaudRate.BR9600
+  elif speed == B19200:
+    result = BaudRate.BR19200
+  elif speed == B38400:
+    result = BaudRate.BR38400
+  else:
+    raise newException(BaudRateUnknownError, "Unknown baud rate with value: " & $speed)
 
 proc `dataBits=`*(port: SerialPort, db: DataBits) {.raises: [PortClosedError, OSError].} =
   ## Set the number of data bits that the serial port operates with.

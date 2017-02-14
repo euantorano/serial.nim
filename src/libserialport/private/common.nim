@@ -77,5 +77,8 @@ type
   StopBitsUnknownError* = object of SerialPortError
     ## Raised when an unknown number of stop bits is being used.
 
+  BaudRateUnknownError* = object of SerialPortError
+    ## Raised when an unknown baud rate is being used.
+
 proc `$`*(port: Serialport): string = port.name
   ## Convert a port to a string, using the port's name.
