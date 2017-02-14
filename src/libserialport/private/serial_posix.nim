@@ -34,37 +34,37 @@ proc openPort(path: string): FileHandle {.raises: [OSError].} =
 
 proc convertBaudRate(br: BaudRate): Speed =
   case br
-  of BR0:
+  of BaudRate.BR0:
     result = B0
-  of BR50:
+  of BaudRate.BR50:
     result = B50
-  of BR75:
+  of BaudRate.BR75:
     result = B75
-  of BR110:
+  of BaudRate.BR110:
     result = B110
-  of BR134:
+  of BaudRate.BR134:
     result = B134
-  of BR150:
+  of BaudRate.BR150:
     result = B150
-  of BR200:
+  of BaudRate.BR200:
     result = B200
-  of BR300:
+  of BaudRate.BR300:
     result = B300
-  of BR600:
+  of BaudRate.BR600:
     result = B600
-  of BR1200:
+  of BaudRate.BR1200:
     result = B1200
-  of BR1800:
+  of BaudRate.BR1800:
     result = B1800
-  of BR2400:
+  of BaudRate.BR2400:
     result = B2400
-  of BR4800:
+  of BaudRate.BR4800:
     result = B4800
-  of BR9600:
+  of BaudRate.BR9600:
     result = B9600
-  of BR19200:
+  of BaudRate.BR19200:
     result = B19200
-  of BR38400:
+  of BaudRate.BR38400:
     result = B38400
 
 proc setBaudRate(options: ptr Termios, br: BaudRate) {.raises: [OSError].} =
