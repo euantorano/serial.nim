@@ -56,7 +56,7 @@ when defined(nimdoc):
   proc write*(port: SerialPort, data: pointer, length: int, timeout: uint = 0): int {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [WriteIOEffect].} =
     ## Write the data in the buffer pointed to by `data` with the given `length` to the serial port.
 
-  proc write*(port: SerialPort, data: cstring, timeout: uint = 0) {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [WriteIOEffect].} = discard
+  proc write*(port: SerialPort, data: string, timeout: uint = 0) {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [WriteIOEffect].} = discard
     ## Write `data` to the serial port. This ensures that all of `data` is written.
 
   proc read*(port: SerialPort, data: pointer, size: int, timeout: uint = 0): int
@@ -73,9 +73,3 @@ elif defined(windows):
   include libserialport/private/serial_windows
 else:
   {.error: "Serial port handling not implemented for your platform".}
-
-proc write*(port: SerialPort, data: string, timeout: uint = 0) {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [WriteIOEffect].} =
-  ## Write `data` to the serial port. This ensures that all of `data` is written.
-  ##
-  ## You can optionally set a timeout (in seconds) for the write operation by passing a non-zero `timeout` value.
-  port.write(data.cstring, timeout)

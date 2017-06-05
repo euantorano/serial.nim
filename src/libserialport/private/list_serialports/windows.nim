@@ -37,7 +37,7 @@ proc SetupDiOpenDevRegKey(DeviceInfoSet: HDEVINFO, DeviceInfoData: ptr SP_DEVINF
 proc SetupDiDestroyDeviceInfoList(DeviceInfoSet: HDEVINFO): bool
   {.stdcall, importc: "SetupDiDestroyDeviceInfoList", dynlib: "setupapi.dll".}
 
-iterator listSerialPorts*(): string {.raises: [OSError].} =
+iterator listSerialPorts*(): string =
   ## Iterates through a list of serial port names currently available on the system.
   ##
   ## This is based upon the `CEnumerateSerial::QueryUsingSetupAPI` method from `CEnumerateSerial`: http://www.naughter.com/enumser.html

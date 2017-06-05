@@ -51,7 +51,7 @@ proc setDataBits(options: var DCB, db: DataBits) =
   ## Set the number of data bits on the given `Termios` instance.
   options.ByteSize = byte(db)
 
-proc setParity(options: var DCB, parity: Parity) =
+proc setParity(options: var DCB, parity: Parity) {.inline.} =
   ## Set the parity on the given `Termios` instance.
   case parity
   of Parity.none:
@@ -65,7 +65,7 @@ proc setParity(options: var DCB, parity: Parity) =
   of Parity.space:
     options.Parity = byte(4)
 
-proc setStopBits(options: var DCB, sb: StopBits) =
+proc setStopBits(options: var DCB, sb: StopBits) {.inline.} =
   ## Set the number of stop bits on the given `Termios` instance.
   case sb
   of StopBits.one:
@@ -75,7 +75,7 @@ proc setStopBits(options: var DCB, sb: StopBits) =
   of StopBits.two:
     options.StopBits = byte(2)
 
-proc setHardwareFlowControl(options: var DCB, enabled: bool) =
+proc setHardwareFlowControl(options: var DCB, enabled: bool) {.inline.} =
   ## Set whether to use CTS/RTS flow control.
   # Enable RTS handshaking - there are other options, but are they needed?
   if enabled:
@@ -85,7 +85,7 @@ proc setHardwareFlowControl(options: var DCB, enabled: bool) =
     options.fRtsControl = 0
     options.fOutxCtsFlow = 0
 
-proc setSoftwareFlowControl(options: var DCB, enabled: bool) =
+proc setSoftwareFlowControl(options: var DCB, enabled: bool) {.inline.} =
   ## Set whether to use XON/XOFF software flow control.
   if enabled:
     options.fOutX = 1
@@ -94,23 +94,23 @@ proc setSoftwareFlowControl(options: var DCB, enabled: bool) =
     options.fOutX = 0
     options.fInX = 0
 
-proc setWriteTimeout(port: SerialPort, timeout: uint) {.raises: [OSError].} =
-  ## Set the write timeout from the given serial port.
+proc setWriteTimeout(port: SerialPort, timeout: uint) {.inline.} =
+  ## Set the write timeout from the given serial port. Timeout is in milliseconds.
   var timeouts: COMMTIMEOUTS
 
   if not GetCommTimeouts(port.handle, addr timeouts):
     raiseOSError(osLastError())
 
-  timeouts.WriteTotalTimeoutConstant = DWORD(timeout * 1000)
+  timeouts.WriteTotalTimeoutConstant = DWORD(timeout)
   timeouts.WriteTotalTimeoutMultiplier = 0
 
   if not SetCommTimeouts(port.handle, addr timeouts):
     raiseOSError(osLastError())
 
-  port.writeTimeoutSeconds = timeout
+  port.writeTimeoutMilliseconds = timeout
 
-proc setReadTimeout(port: SerialPort, timeout: uint) {.raises: [OSError].} =
-  ## Set the write timeout for the given serial port.
+proc setReadTimeout(port: SerialPort, timeout: uint) {.inline.} =
+  ## Set the write timeout for the given serial port. Timeout is in milliseconds.
   var timeouts: COMMTIMEOUTS
 
   if not GetCommTimeouts(port.handle, addr timeouts):
@@ -122,19 +122,19 @@ proc setReadTimeout(port: SerialPort, timeout: uint) {.raises: [OSError].} =
     timeouts.ReadTotalTimeoutConstant = 0
     timeouts.ReadTotalTimeoutMultiplier = 0
   else:
-    timeouts.ReadTotalTimeoutConstant = DWORD(timeout * 1000)
+    timeouts.ReadTotalTimeoutConstant = DWORD(timeout)
     timeouts.ReadIntervalTimeout = 0
     timeouts.ReadTotalTimeoutMultiplier = 0
 
   if not SetCommTimeouts(port.handle, addr timeouts):
     raiseOSError(osLastError())
 
-  port.readTimeoutSeconds = timeout
+  port.readTimeoutMilliseconds = timeout
 
 proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
     dataBits: DataBits = DataBits.eight, parity: Parity = Parity.none,
     stopBits: StopBits = StopBits.one, useHardwareFlowControl: bool = false,
-    useSoftwareFlowControl: bool = false): SerialPort {.raises: [OSError].} =
+    useSoftwareFlowControl: bool = false): SerialPort =
   ## Open the serial port with the given name.
   ##
   ## If the serial port at the given path is not found, a `InvalidPortNameError` will be raised.
@@ -182,7 +182,7 @@ proc openSerialPort*(name: string, baudRate: BaudRate = BaudRate.BR9600,
 proc isClosed*(port: SerialPort): bool = port.handle == INVALID_HANDLE_VALUE
   ## Determine whether the given port is open or closed.
 
-proc close*(port: SerialPort) {.raises: [OSError].} =
+proc close*(port: SerialPort) =
   ## Close the seial port, restoring its original settings.
   if closeHandle(port.handle) == 0:
     raiseOSError(osLastError())
@@ -193,7 +193,7 @@ template checkPortIsNotClosed(port: SerialPort) =
   if port.isClosed:
     raise newException(PortClosedError, "Port '" & port.name & "' is closed")
 
-proc `baudRate=`*(port: SerialPort, br: BaudRate) {.raises: [PortClosedError, OSError].} =
+proc `baudRate=`*(port: SerialPort, br: BaudRate) =
   ## Set the baud rate that the serial port operates at.
   checkPortIsNotClosed(port)
 
@@ -206,7 +206,7 @@ proc `baudRate=`*(port: SerialPort, br: BaudRate) {.raises: [PortClosedError, OS
   if not SetCommState(port.handle, addr options):
     raiseOSError(osLastError())
 
-proc baudRate*(port: SerialPort): BaudRate {.raises: [PortClosedError, OSError].} =
+proc baudRate*(port: SerialPort): BaudRate =
   ## Get the baud rate that the serial port is currently operating at.
   checkPortIsNotClosed(port)
 
@@ -216,7 +216,7 @@ proc baudRate*(port: SerialPort): BaudRate {.raises: [PortClosedError, OSError].
 
   result = BaudRate(options.BaudRate)
 
-proc `dataBits=`*(port: SerialPort, db: DataBits) {.raises: [PortClosedError, OSError].} =
+proc `dataBits=`*(port: SerialPort, db: DataBits) =
   ## Set the number of data bits that the serial port operates with.
   checkPortIsNotClosed(port)
 
@@ -229,7 +229,7 @@ proc `dataBits=`*(port: SerialPort, db: DataBits) {.raises: [PortClosedError, OS
   if not SetCommState(port.handle, addr options):
     raiseOSError(osLastError())
 
-proc dataBits*(port: SerialPort): DataBits {.raises: [PortClosedError, OSError].} =
+proc dataBits*(port: SerialPort): DataBits =
   ## Get the number of data bits that the serial port operates with.
   checkPortIsNotClosed(port)
 
@@ -239,7 +239,7 @@ proc dataBits*(port: SerialPort): DataBits {.raises: [PortClosedError, OSError].
 
   result = DataBits(options.ByteSize)
 
-proc `parity=`*(port: SerialPort, parity: Parity) {.raises: [PortClosedError, OSError].} =
+proc `parity=`*(port: SerialPort, parity: Parity) =
   ## Set the parity that the serial port operates with.
   checkPortIsNotClosed(port)
 
@@ -252,7 +252,7 @@ proc `parity=`*(port: SerialPort, parity: Parity) {.raises: [PortClosedError, OS
   if not SetCommState(port.handle, addr options):
     raiseOSError(osLastError())
 
-proc parity*(port: SerialPort): Parity {.raises: [PortClosedError, ParityUnknownError, OSError].} =
+proc parity*(port: SerialPort): Parity =
   ## Get the parity that the serial port operates with.
   checkPortIsNotClosed(port)
 
@@ -274,7 +274,7 @@ proc parity*(port: SerialPort): Parity {.raises: [PortClosedError, ParityUnknown
   else:
     raise newException(ParityUnknownError, "Unknown parity: " & $options.Parity)
 
-proc `stopBits=`*(port: SerialPort, sb: StopBits) {.raises: [PortClosedError, OSError].} =
+proc `stopBits=`*(port: SerialPort, sb: StopBits) =
   ## Set the number of stop bits that the serial port operates with.
   checkPortIsNotClosed(port)
 
@@ -287,7 +287,7 @@ proc `stopBits=`*(port: SerialPort, sb: StopBits) {.raises: [PortClosedError, OS
   if not SetCommState(port.handle, addr options):
     raiseOSError(osLastError())
 
-proc stopBits*(port: SerialPort): StopBits {.raises: [PortClosedError, StopBitsUnknownError, OSError].} =
+proc stopBits*(port: SerialPort): StopBits =
   ## Get the number of stop bits that the serial port operates with.
   checkPortIsNotClosed(port)
 
@@ -305,7 +305,7 @@ proc stopBits*(port: SerialPort): StopBits {.raises: [PortClosedError, StopBitsU
   else:
     raise newException(StopBitsUnknownError, "unknown number of stop bits: " & $options.StopBits)
 
-proc `hardwareFlowControl=`*(port: SerialPort, enabled: bool) {.raises: [PortClosedError, OSError].} =
+proc `hardwareFlowControl=`*(port: SerialPort, enabled: bool) =
   ## Set whether to use RTS and CTS flow control for sending/receiving data with the serial port.
   checkPortIsNotClosed(port)
 
@@ -318,7 +318,7 @@ proc `hardwareFlowControl=`*(port: SerialPort, enabled: bool) {.raises: [PortClo
   if not SetCommState(port.handle, addr options):
     raiseOSError(osLastError())
 
-proc hardwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OSError].} =
+proc hardwareFlowControl*(port: SerialPort): bool =
   ## Get whether RTS/CTS is enabled for the serial port.
   checkPortIsNotClosed(port)
 
@@ -328,7 +328,7 @@ proc hardwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OS
 
   result = options.fRtsControl != 0 and options.fOutxCtsFlow != 0
 
-proc `softwareFlowControl=`*(port: SerialPort, enabled: bool) {.raises: [PortClosedError, OSError].} =
+proc `softwareFlowControl=`*(port: SerialPort, enabled: bool) =
   ## Set whether to use XON/XOFF software flow control for sending/receiving data with the serial port.
   checkPortIsNotClosed(port)
 
@@ -341,7 +341,7 @@ proc `softwareFlowControl=`*(port: SerialPort, enabled: bool) {.raises: [PortClo
   if not SetCommState(port.handle, addr options):
     raiseOSError(osLastError())
 
-proc softwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OSError].} =
+proc softwareFlowControl*(port: SerialPort): bool =
   ## Get whether XON?XOFF software flow control is enabled for the serial port.
   checkPortIsNotClosed(port)
 
@@ -351,12 +351,14 @@ proc softwareFlowControl*(port: SerialPort): bool {.raises: [PortClosedError, OS
 
   result = options.fOutX != 0 and options.fInX != 0
 
-proc write*(port: SerialPort, data: pointer, length: int, timeout: uint = 0): int {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [WriteIOEffect].} =
+proc write*(port: SerialPort, data: pointer, length: int, timeout: uint = 0): int {.tags: [WriteIOEffect].} =
   ## Write the data in the buffer pointed to by `data` with the given `length` to the serial port.
+  ##
+  ## You can optionally set a timeout (in milliseconds) for the write operation by passing a non-zero `timeout` value.
   checkPortIsNotClosed(port)
 
   # if the last write operation used the same timeout, do not change the timeout.
-  if timeout != port.writeTimeoutSeconds:
+  if timeout != port.writeTimeoutMilliseconds:
     setWriteTimeout(port, timeout)
 
   var numWritten: int32
@@ -368,14 +370,14 @@ proc write*(port: SerialPort, data: pointer, length: int, timeout: uint = 0): in
 
   result = int(numWritten)
 
-proc write*(port: SerialPort, data: cstring, timeout: uint = 0) {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [WriteIOEffect].} =
+proc write*(port: SerialPort, data: string, timeout: uint = 0) {.tags: [WriteIOEffect].} =
   ## Write `data` to the serial port. This ensures that all of `data` is written.
   ##
-  ## You can optionally set a timeout (in seconds) for the write operation by passing a non-zero `timeout` value.
+  ## You can optionally set a timeout (in milliseconds) for the write operation by passing a non-zero `timeout` value.
   checkPortIsNotClosed(port)
 
   # if the last write operation used the same timeout, do not change the timeout.
-  if timeout != port.writeTimeoutSeconds:
+  if timeout != port.writeTimeoutMilliseconds:
     setWriteTimeout(port, timeout)
 
   let dataLen: int32 = int32(len(data))
@@ -392,8 +394,7 @@ proc write*(port: SerialPort, data: cstring, timeout: uint = 0) {.raises: [PortC
 
     inc(totalWritten, numWritten)
 
-proc read*(port: SerialPort, data: pointer, size: int, timeout: uint = 0): int
-  {.raises: [PortClosedError, PortTimeoutError, OSError], tags: [ReadIOEffect].} =
+proc read*(port: SerialPort, data: pointer, size: int, timeout: uint = 0): int {.tags: [ReadIOEffect].} =
   ## Read from the serial port into the buffer pointed to by `data`, with buffer length `size`.
   ##
   ## This will return the number of bytes received, as it does not guarantee that the buffer will be filled completely.
@@ -403,7 +404,7 @@ proc read*(port: SerialPort, data: pointer, size: int, timeout: uint = 0): int
   checkPortIsNotClosed(port)
 
   # if the last read operation used the same timeout, do not change the timeout.
-  if timeout != port.readTimeoutSeconds:
+  if timeout != port.readTimeoutMilliseconds:
     setReadTimeout(port, timeout)
 
   var numBytesRead: int32

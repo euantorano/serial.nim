@@ -16,8 +16,8 @@ else:
   {.warning: "Unknown platform, listing serial ports is not supported.".}
 
 when supportedPlatform:
-  iterator listSerialPorts*(): string {.raises:[OSError].} =
+  iterator listSerialPorts*(): string =
     for p in walkPattern(serialDevicesPattern):
       yield p
 else:
-  iterator listSerialPorts*(): string {.raises:[OSError].} = discard
+  iterator listSerialPorts*(): string = discard

@@ -17,12 +17,12 @@ proc checkPath(path: string): bool =
     if subsystem != "platform":
       result = true
 
-iterator getPortsForPath(path: string): string {.raises: [OSError].} =
+iterator getPortsForPath(path: string): string =
   for f in walkPattern(path):
     if checkPath(f):
       yield f
 
-iterator listSerialPorts*(): string {.raises:[OSError].} =
+iterator listSerialPorts*(): string =
   for path in deviceGrepPaths:
     for port in getPortsForPath(path):
       yield port

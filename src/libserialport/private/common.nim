@@ -50,8 +50,8 @@ type
       oldPortSettings: Termios
     elif defined(windows) and not defined(nimdoc):
       handle: HANDLE
-      readTimeoutSeconds: uint
-      writeTimeoutSeconds: uint
+      readTimeoutMilliseconds: uint
+      writeTimeoutMilliseconds: uint
 
   SerialPort* = ref SerialPortObj
     ## Represents a serial port.
