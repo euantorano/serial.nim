@@ -362,7 +362,7 @@ proc write*(port: SerialPort, data: pointer, length: int, timeout: uint = 0): in
     setWriteTimeout(port, timeout)
 
   var numWritten: int32
-  if writeFile(port.handle, data[totalWritten].unsafeAddr, dataLen - totalWritten, addr numWritten, nil) == 0:
+  if writeFile(port.handle, data, int32(length), addr numWritten, nil) == 0:
     raiseOSError(osLastError())
 
   if numWritten == 0:
