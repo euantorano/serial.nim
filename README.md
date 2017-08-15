@@ -1,87 +1,66 @@
-# libserialport.nim
+# serial.nim
 
 A library to work with serial ports using pure Nim.
 
 ## Installation
 
+`postgres` can be installed using Nimble:
+
 ```
-nimble install libserialport
+nimble install serial
 ```
+
+Or add the following to your .nimble file:
+
+```
+# Dependencies
+
+requires "serial >= 1.0.0"
+```
+
+## [API Documentation](https://htmlpreview.github.io/?https://github.com/euantorano/serial.nim/blob/master/docs/serial.html)
 
 ## Usage
 
-### Reading from a serial port, into a pre-defined buffer:
+There are two examples in the `examples` directory, showing reading from and writing to a serialport.
+
+### Listing serial ports
 
 ```nim
-import libserialport
+import serial # Or: `import serial/utils`
 
-let port = openSerialPort("COM3",
-    baudRate=BaudRate.BR9600, dataBits=DataBits.eight,
-    stopBits=StopBits.one, parity=Parity.none,
-    useHardwareFlowControl=true, useSoftwareFlowControl=false)
-defer: port.close()
-
-## The baud rate, data bits, stop bits and parity default to 9600, 8, 1 and none - in that order
-
-echo "Opened port: ", $port
-
-echo "Baud rate: ", port.baudRate
-echo "Data bits: ", port.dataBits
-echo "Parity: ", port.parity
-echo "Stop bits: ", port.stopBits
-echo "Hardware flow control: ", port.hardwareFlowControl
-echo "Software flow control: ", port.softwareFlowControl
-
-var readBuffer = newString(100)
-var numRead = port.read(readBuffer[0].addr, len(readBuffer))
-echo "Read ", numRead, " bytes from the serial port: ", readBuffer
-
-## You can also set a read timeout, rather than blocking until some data is received:
-
-numRead = port.read(readBuffer[0].addr, len(readBuffer), timeout=5) # Wait for 5 seconds. If no data is received, a `PortTimeoutError` is raised
-echo "Read ", numRead, " bytes from the serial port: ", readBuffer
+for port in listSerialPorts():
+  echo port
 ```
 
-### Writing to a serial port:
+### Reading from/writing to a serial port (echoing data)
 
 ```nim
-import libserialport
+import serial # Or: `import serial/serialport`
 
-let port = openSerialPort("COM3",
-    baudRate=BaudRate.BR9600, dataBits=DataBits.eight,
-    stopBits=StopBits.one, parity=Parity.none,
-    useHardwareFlowControl=true, useSoftwareFlowControl=false)
-defer: port.close()
+let port = newSerialPort("COM1")
+# use 9600bps, no parity, 8 data bits and 1 stop bit
+port.open(9600, Parity.None, 8, StopBits.One)
 
-## The baud rate, data bits, stop bits and parity default to 9600, 8, 1 and none - in that order
+# You can modify the baud rate, parity, databits, etc. after opening the port
+port.baudRate = 2400
 
-echo "Opened port: ", $port
-
-echo "Baud rate: ", port.baudRate
-echo "Data bits: ", port.dataBits
-echo "Parity: ", port.parity
-echo "Stop bits: ", port.stopBits
-echo "Hardware flow control: ", port.hardwareFlowControl
-echo "Software flow control: ", port.softwareFlowControl
-
-## The below will write as much data as it can
-var dataToSend = "Hello, World!"
-var numWritten = port.write(dataToSend[0].addr, len(dataToSend))
-echo "Wrote ", numWritten, " bytes to the serial port"
-
-## Rather than working with pointers, there are also convenience methods that have timeouts:
-let newDataToSend = "This is a test"
-port.write(newDataToSend, timeout=5) # Wait for 5 seconds. If the data isn't transmitted in time, a `PortTimeoutError` is raised
-# This will also guarantee that all of the data is written, unless an error occurs
+var receiveBuffer = newString(1024)
+while true:
+  let numReceived = port.read(receiveBuffer, len(receiveBuffer))
+  port.write(receiveBuffer, numReceived)
 ```
 
-### Listing serial ports available on the system
+### Using the SerialStream
 
 ```nim
-import libserialport
+import serial # Or: `import serial/serialstream`
 
-for p in listSerialPorts():
-  echo "Found serial port: ", p
+let port = newSerialStream("COM1", 9600, Parity.None, 8, StopBits.One, buffered=true)
+
+while true:
+  # Read a line from the serial port then write it back.
+  port.writeLine(port.readLine())
 ```
 
 ## Todo List
@@ -96,5 +75,5 @@ for p in listSerialPorts():
     - [X] Windows, using `SetupDiGetClassDevs`
     - [X] Mac, using I/O Kit
     - [X] Posix, by iteratng possible device files
-- [ ] High level `SerialPortStream` that complies with the `streams` API
+- [X] High level `SerialPortStream` that complies with the `streams` API
 - [ ] Async API using `asyncdispatch`

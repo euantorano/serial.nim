@@ -1,0 +1,11 @@
+TIMEOUT_INFINITE	serialport_common.html#TIMEOUT_INFINITE	serialport_common : TIMEOUT_INFINITE	
+Parity	serialport_common.html#Parity	serialport_common : Parity	
+Handshake	serialport_common.html#Handshake	serialport_common : Handshake	
+StopBits	serialport_common.html#StopBits	serialport_common : StopBits	
+InvalidSerialPortError	serialport_common.html#InvalidSerialPortError	serialport_common : InvalidSerialPortError	
+TimeoutError	serialport_common.html#TimeoutError	serialport_common : TimeoutError	
+InvalidSerialPortStateError	serialport_common.html#InvalidSerialPortStateError	serialport_common : InvalidSerialPortStateError	
+InvalidBaudRateError	serialport_common.html#InvalidBaudRateError	serialport_common : InvalidBaudRateError	
+InvalidDataBitsError	serialport_common.html#InvalidDataBitsError	serialport_common : InvalidDataBitsError	
+InvalidStopBitsError	serialport_common.html#InvalidStopBitsError	serialport_common : InvalidStopBitsError	
+ReceivedError	serialport_common.html#ReceivedError	serialport_common : ReceivedError	

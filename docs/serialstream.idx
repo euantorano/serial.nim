@@ -1,0 +1,26 @@
+BufferSize	serialstream.html#BufferSize	serialstream : BufferSize	
+SerialStream	serialstream.html#SerialStream	serialstream : SerialStream	
+newSerialStream	serialstream.html#newSerialStream,SerialPort	serialstream : newSerialStream(p: SerialPort; buffered = false): SerialStream	
+newSerialStream	serialstream.html#newSerialStream,string,int32,Parity,byte,StopBits,Handshake	serialstream : newSerialStream(portName: string; baudRate: int32; parity: Parity; dataBits: byte;\n                stopBits: StopBits; handshaking: Handshake = Handshake.None;\n                readTimeout = TIMEOUT_INFINITE; writeTimeout = TIMEOUT_INFINITE;\n                dtrEnable = false; buffered = false): SerialStream	
+getTimeouts	serialstream.html#getTimeouts,SerialStream	serialstream : getTimeouts(stream: SerialStream): tuple[readTimeout: int32, writeTimeout: int32]	
+setTimeouts	serialstream.html#setTimeouts,SerialStream,int32,int32	serialstream : setTimeouts(stream: SerialStream; readTimeout: int32; writeTimeout: int32)	
+isCarrierHolding	serialstream.html#isCarrierHolding,SerialStream	serialstream : isCarrierHolding(stream: SerialStream): bool	
+isCtsHolding	serialstream.html#isCtsHolding,SerialStream	serialstream : isCtsHolding(stream: SerialStream): bool	
+isDsrHolding	serialstream.html#isDsrHolding,SerialStream	serialstream : isDsrHolding(stream: SerialStream): bool	
+isRingHolding	serialstream.html#isRingHolding,SerialStream	serialstream : isRingHolding(stream: SerialStream): bool	
+stopBits=	serialstream.html#stopBits=,SerialStream,StopBits	serialstream : stopBits=(stream: SerialStream; stopBits: StopBits)	
+stopBits	serialstream.html#stopBits,SerialStream	serialstream : stopBits(stream: SerialStream): StopBits	
+dataBits=	serialstream.html#dataBits=,SerialStream,byte	serialstream : dataBits=(stream: SerialStream; dataBits: byte)	
+dataBits	serialstream.html#dataBits,SerialStream	serialstream : dataBits(stream: SerialStream): byte	
+baudRate=	serialstream.html#baudRate=,SerialStream,int32	serialstream : baudRate=(stream: SerialStream; baudRate: int32)	
+baudRate	serialstream.html#baudRate,SerialStream	serialstream : baudRate(stream: SerialStream): int32	
+parity=	serialstream.html#parity=,SerialStream,Parity	serialstream : parity=(stream: SerialStream; parity: Parity)	
+parity	serialstream.html#parity,SerialStream	serialstream : parity(stream: SerialStream): Parity	
+breakStatus=	serialstream.html#breakStatus=,SerialStream,bool	serialstream : breakStatus=(stream: SerialStream; shouldBreak: bool)	
+breakStatus	serialstream.html#breakStatus,SerialStream	serialstream : breakStatus(stream: SerialStream): bool	
+dtrEnable=	serialstream.html#dtrEnable=,SerialStream,bool	serialstream : dtrEnable=(stream: SerialStream; dtrEnabled: bool)	
+dtrEnable	serialstream.html#dtrEnable,SerialStream	serialstream : dtrEnable(stream: SerialStream): bool	
+rtsEnable=	serialstream.html#rtsEnable=,SerialStream,bool	serialstream : rtsEnable=(stream: SerialStream; rtsEnabled: bool)	
+rtsEnable	serialstream.html#rtsEnable,SerialStream	serialstream : rtsEnable(stream: SerialStream): bool	
+handshake=	serialstream.html#handshake=,SerialStream,Handshake	serialstream : handshake=(stream: SerialStream; handshake: Handshake)	
+handshake	serialstream.html#handshake,SerialStream	serialstream : handshake(stream: SerialStream): Handshake	
