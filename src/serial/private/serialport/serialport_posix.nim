@@ -22,14 +22,15 @@ var
   TIOCMBIS {.importc, header: "<termios.h>".}: cint
 
 type
-    SerialPort* = ref SerialPortObj
+  SerialPort* = ref SerialPortObj
+    ## A serial port type used to read from and write to serial ports.
 
-    SerialPortObj = object
-      name*: string
-      handshake: Handshake
-      handle: cint
-      readTimeout: int32
-      writeTimeout: int32
+  SerialPortObj = object
+    name*: string
+    handshake: Handshake
+    handle: cint
+    readTimeout: int32
+    writeTimeout: int32
 
 proc ioctl(handle: cint, command: cint, arg: ptr cint): cint {.importc, header: "<sys/ioctl.h>".}
 
@@ -449,7 +450,7 @@ proc handshake*(port: SerialPort): Handshake =
 
 proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, stopBits: StopBits,
            handshaking: Handshake = Handshake.None, readTimeout = TIMEOUT_INFINITE,
-           writeTimeout = TIMEOUT_INFINITE, dtrEnable = false) =
+           writeTimeout = TIMEOUT_INFINITE, dtrEnable = false, rtsEnable = false) =
   ## Open the serial port for reading and writing.
   if port.isOpen():
     raise newException(InvalidSerialPortStateError, "Serial port is already open.")

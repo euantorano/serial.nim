@@ -12,10 +12,10 @@ const
   FileCreationDisposition: DWORD = DWORD(OPEN_EXISTING)
   FileFlagsAndAttributes: DWORD = DWORD(FILE_ATTRIBUTE_NORMAL)
   FileTemplateHandle: Handle = Handle(0)
-  PortErrorEvents = DWORD(CE_FRAME or CE_OVERRUN or CE_RXOVER or CE_PARITY)
 
 type
   SerialPort* = ref SerialPortObj
+    ## A serial port type used to read from and write to serial ports.
 
   SerialPortObj = object
     name*: string
@@ -25,9 +25,8 @@ type
     comStat: ComStat
     dcb: DCB
     commTimeouts: COMMTIMEOUTS
-    dtrEnable: bool
-    rtsEnable: bool
-    inBreak: bool
+    isRtsEnabled: bool
+    isInBreak: bool
 
 proc newSerialPort*(portName: string): SerialPort =
   ## Initialise a new serial port, ready to open.
@@ -335,12 +334,12 @@ proc `breakStatus=`*(port: SerialPort, shouldBreak: bool) =
     if SetCommBreak(port.handle) == 0:
       raiseOSError(osLastError())
 
-    port.inBreak = true
+    port.isInBreak = true
   else:
     if ClearCommBreak(port.handle) == 0:
       raiseOSError(osLastError())
 
-    port.inBreak = false
+    port.isInBreak = false
 
 proc breakStatus*(port: SerialPort): bool =
   ## Get whether the serial port is currently in a break state.
@@ -349,13 +348,9 @@ proc breakStatus*(port: SerialPort): bool =
   if not port.isOpen():
     raise newException(InvalidSerialPortStateError, "Cannot get break whilst the serial port is closed")
 
-  result = port.inBreak
+  result = port.isInBreak
 
-proc `dtrEnable=`*(port: SerialPort, dtrEnabled: bool) =
-  ## Set or clear the data terminal ready signal.
-  if not port.isOpen():
-    raise newException(InvalidSerialPortStateError, "Cannot change the data terminal ready signal status whilst the serial port is closed")
-
+proc setDtrEnable(port: SerialPort, dtrEnabled: bool) =
   let currentDtrControl = port.dcb.fDtrControl
   port.dcb.fDtrControl = if dtrEnabled: DTR_CONTROL_ENABLE else: DTR_CONTROL_DISABLE
   if SetCommState(port.handle, addr port.dcb) == 0:
@@ -366,6 +361,13 @@ proc `dtrEnable=`*(port: SerialPort, dtrEnabled: bool) =
   if EscapeCommFunction(port.handle, if dtrEnabled: SETDTR else: CLRDTR) == 0:
     raiseOSError(osLastError())
 
+proc `dtrEnable=`*(port: SerialPort, dtrEnabled: bool) =
+  ## Set or clear the data terminal ready signal.
+  if not port.isOpen():
+    raise newException(InvalidSerialPortStateError, "Cannot change the data terminal ready signal status whilst the serial port is closed")
+
+  setDtrEnable(port, dtrEnabled)
+
 proc dtrEnable*(port: SerialPort): bool =
   ## Check whether the data terminal ready signal is currently set.
   if not port.isOpen():
@@ -373,18 +375,14 @@ proc dtrEnable*(port: SerialPort): bool =
 
   result = port.dcb.fDtrControl == DTR_CONTROL_ENABLE
 
-proc `rtsEnable=`*(port: SerialPort, rtsEnabled: bool) =
-  ## Set or clear the ready to send signal.
-  if not port.isOpen():
-    raise newException(InvalidSerialPortStateError, "Cannot change the ready to send signal status whilst the serial port is closed")
-
+proc setRtsEnable(port: SerialPort, rtsEnabled: bool) =
   if port.handshake in {Handshake.RequestToSend, Handshake.RequestToSendXOnXOff}:
     raise newException(InvalidSerialPortStateError, "Cannot set or clear RTS when using RTS or RTS XON/XOFF handshaking")
 
-  if rtsEnabled != port.rtsEnable:
+  if rtsEnabled != port.isRtsEnabled:
     let oldRtsControl = port.dcb.fRtsControl
 
-    port.rtsEnable = rtsEnabled
+    port.isRtsEnabled = rtsEnabled
     if rtsEnabled:
       port.dcb.fRtsControl = RTS_CONTROL_ENABLE
     else:
@@ -392,12 +390,19 @@ proc `rtsEnable=`*(port: SerialPort, rtsEnabled: bool) =
 
     if SetCommState(port.handle, addr port.dcb) == 0:
       port.dcb.fRtsControl = oldRtsControl
-      port.rtsEnable = not rtsEnabled
+      port.isRtsEnabled = not rtsEnabled
 
       raiseOSError(osLastError())
 
     if EscapeCommFunction(port.handle, if rtsEnabled: SETRTS else: CLRRTS) == 0:
       raiseOSError(osLastError())
+
+proc `rtsEnable=`*(port: SerialPort, rtsEnabled: bool) =
+  ## Set or clear the ready to send signal.
+  if not port.isOpen():
+    raise newException(InvalidSerialPortStateError, "Cannot change the ready to send signal status whilst the serial port is closed")
+
+  setRtsEnable(port, rtsEnabled)
 
 proc rtsEnable*(port: SerialPort): bool =
   ## Check whether the ready to send signal is currently set.
@@ -452,26 +457,9 @@ proc handshake*(port: SerialPort): Handshake =
 
   result = port.handshake
 
-proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, stopBits: StopBits,
-           handshaking: Handshake = Handshake.None, readTimeout = TIMEOUT_INFINITE,
-           writeTimeout = TIMEOUT_INFINITE, dtrEnable = false) =
-  ## Open the serial port for reading and writing.
-  if port.isOpen():
-    raise newException(InvalidSerialPortStateError, "Serial port is already open.")
-
-  let tempHandle = CreateFileWindows(
-    getWindowsString("\\\\.\\" & port.name),
-    FileAccess,
-    FileShareMode, # Open with exclusive access
-    nil, # No security attributes
-    FileCreationDisposition,
-    FileFlagsAndAttributes,
-    FileTemplateHandle # hTemplate must be NULL for comm devices
-  )
-
-  if tempHandle == INVALID_HANDLE_VALUE:
-    raiseOSError(osLastError())
-
+proc initPort(port: SerialPort, tempHandle: Handle, baudRate: int32, parity: Parity, dataBits: byte, stopBits: StopBits,
+              handshaking: Handshake = Handshake.None, readTimeout = TIMEOUT_INFINITE,
+              writeTimeout = TIMEOUT_INFINITE, dtrEnable = false, rtsEnable = false) {.inline.} =
   try:
     let fileType = GetFileType(tempHandle)
     if not (fileType in {DWORD(FileType.Character), DWORD(FileType.Unknown)}):
@@ -495,12 +483,11 @@ proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, st
 
     initDcb(port, baudRate, parity, dataBits, stopBits, handshaking)
 
-    port.dtrEnable = dtrEnable
-    port.rtsEnable = (port.dcb.fRtsControl == RTS_CONTROL_ENABLE)
+    port.setDtrEnable(dtrEnable)
+    port.isRtsEnabled = (port.dcb.fRtsControl == RTS_CONTROL_ENABLE)
 
     if handshaking != Handshake.RequestToSend and handshaking != Handshake.RequestToSendXOnXOff:
-      # TODO: Set the RTS enable flag
-      discard
+      port.setRtsEnable(rtsEnable)
 
     if GetCommTimeouts(port.handle, addr port.commTimeouts) == 0:
       raiseOSError(osLastError())
@@ -513,23 +500,27 @@ proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, st
     port.handle = INVALID_HANDLE_VALUE
     raise
 
-proc checkErrors(port: SerialPort, errors: DWORD) {.inline.} =
-  if (errors and PortErrorEvents) != 0:
-    if (errors and CE_RXOVER) != 0:
-      #port.eventEmitter.emit(port.errorReceived, ErrorReceivedEventArgs(errorType: ReceivedError.ReceiveOverflow))
-      echo "[ERROR] Receive overflow"
+proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, stopBits: StopBits,
+           handshaking: Handshake = Handshake.None, readTimeout = TIMEOUT_INFINITE,
+           writeTimeout = TIMEOUT_INFINITE, dtrEnable = false, rtsEnable = false) =
+  ## Open the serial port for reading and writing.
+  if port.isOpen():
+    raise newException(InvalidSerialPortStateError, "Serial port is already open.")
 
-    if (errors and CE_OVERRUN) != 0:
-      #port.eventEmitter.emit(port.errorReceived, ErrorReceivedEventArgs(errorType: ReceivedError.Overrun))
-      echo "[ERROR] Overrun"
+  let tempHandle = CreateFileWindows(
+    getWindowsString("\\\\.\\" & port.name),
+    FileAccess,
+    FileShareMode, # Open with exclusive access
+    nil, # No security attributes
+    FileCreationDisposition,
+    FileFlagsAndAttributes,
+    FileTemplateHandle # hTemplate must be NULL for comm devices
+  )
 
-    if (errors and CE_PARITY) != 0:
-      #port.eventEmitter.emit(port.errorReceived, ErrorReceivedEventArgs(errorType: ReceivedError.Parity))
-      echo "[ERROR] RxParity"
+  if tempHandle == INVALID_HANDLE_VALUE:
+    raiseOSError(osLastError())
 
-    if (errors and CE_FRAME) != 0:
-      #port.eventEmitter.emit(port.errorReceived, ErrorReceivedEventArgs(errorType: ReceivedError.Framing))
-      echo "[ERROR] Frame"
+  initPort(port, tempHandle, baudRate, parity, dataBits, stopBits, handshaking, readTimeout, writeTimeout, dtrEnable, rtsEnable)
 
 proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
   ## Read up to `len` bytes from the serial port into the buffer `buff`. This will return the actual number of bytes that were received.
@@ -539,8 +530,6 @@ proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
   var errors: DWORD
   if ClearCommError(port.handle, addr errors, nil) == 0:
     raiseOSError(osLastError())
-
-  port.checkErrors(errors)
 
   if winlean.readFile(port.handle, buff, len, addr result, nil) == 0:
     raiseOSError(osLastError())
@@ -556,8 +545,6 @@ proc write*(port: SerialPort, buff: pointer, len: int32): int32 =
   var errors: DWORD
   if ClearCommError(port.handle, addr errors, nil) == 0:
     raiseOSError(osLastError())
-
-  port.checkErrors(errors)
 
   if winlean.writeFile(port.handle, buff, len, addr result, nil) == 0:
     raiseOSError(osLastError())
@@ -604,4 +591,8 @@ proc close*(port: SerialPort) =
         port.discardOutBuffer()
   finally:
     discard closeHandle(port.handle)
-    port.handle = INVALID_HANDLE_VALUE
+
+    when port is SerialPort:
+      port.handle = INVALID_HANDLE_VALUE
+    else:
+      port.handle = AsyncFD(INVALID_HANDLE_VALUE)

@@ -29,7 +29,6 @@ when isMainModule:
 
     echo "Opened serial port '", portName, "', receiving"
 
-    var toSend: string
     while true:
       echo "Received: ", serialPort.readLine()
 

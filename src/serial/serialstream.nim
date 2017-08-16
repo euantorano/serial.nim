@@ -122,10 +122,10 @@ proc newSerialStream*(p: SerialPort, buffered = false): SerialStream =
 
 proc newSerialStream*(portName: string, baudRate: int32, parity: Parity, dataBits: byte, stopBits: StopBits,
                       handshaking: Handshake = Handshake.None, readTimeout = TIMEOUT_INFINITE,
-                      writeTimeout = TIMEOUT_INFINITE, dtrEnable = false, buffered = false): SerialStream =
+                      writeTimeout = TIMEOUT_INFINITE, dtrEnable = false, rtsEnable = false, buffered = false): SerialStream =
   ## Create a new serial stream for the given serial port with name `portName` and the given settings.
   let port = newSerialPort(portName)
-  port.open(baudRate, parity, dataBits, stopBits, handshaking, readTimeout, writeTimeout, dtrEnable)
+  port.open(baudRate, parity, dataBits, stopBits, handshaking, readTimeout, writeTimeout, dtrEnable, rtsEnable)
 
   result = newSerialStream(port, buffered)
 

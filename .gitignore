@@ -4,3 +4,5 @@ src/serial.exe
 serial_tester
 examples/reader
 examples/writer
+examples/reader.exe
+examples/writer.exe
