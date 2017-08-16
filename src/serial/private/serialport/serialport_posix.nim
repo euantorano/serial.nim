@@ -485,7 +485,7 @@ proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, st
       raiseOSError(osLastError())
 
     port.handle = FileHandle(tempHandle)
-  finally:
+  except:
     discard posix.close(tempHandle)
     port.handle = InvalidFileHandle
 
