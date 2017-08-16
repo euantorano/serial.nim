@@ -4,6 +4,7 @@ import events
 
 const
   TIMEOUT_INFINITE* = -1'i32
+  InvalidFileHandle* = FileHandle(-1)
 
 type
   Parity* {.pure.} = enum

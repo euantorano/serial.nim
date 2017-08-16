@@ -6,9 +6,6 @@ export serialport_common
 
 import os, posix, posix/termios
 
-const
-  INVALID_HANDLE_VALUE: cint = -1
-
 var
   CRTSCTS {.importc, header: "<termios.h>".}: cuint
   TIOCM_DTR {.importc, header: "<termios.h>".}: cint
@@ -22,15 +19,15 @@ var
   TIOCMBIS {.importc, header: "<termios.h>".}: cint
 
 type
-  SerialPort* = ref SerialPortObj
-    ## A serial port type used to read from and write to serial ports.
-
-  SerialPortObj = object
+  SerialPortBase[THandle] = ref object of RootObj
     name*: string
     handshake: Handshake
-    handle: cint
+    handle: FileHandle
     readTimeout: int32
     writeTimeout: int32
+
+  SerialPort* = ref object of SerialPortBase[FileHandle]
+    ## A serial port type used to read from and write to serial ports.
 
 proc ioctl(handle: cint, command: cint, arg: ptr cint): cint {.importc, header: "<sys/ioctl.h>".}
 
@@ -45,12 +42,12 @@ proc newSerialPort*(portName: string): SerialPort =
 
   result = SerialPort(
       name: portName,
-      handle: INVALID_HANDLE_VALUE
+      handle: InvalidFileHandle
   )
 
 proc isOpen*(port: SerialPort): bool =
   ## Check whether the serial port is currently open.
-  result = port.handle != INVALID_HANDLE_VALUE
+  result = port.handle != InvalidFileHandle
 
 proc getTimeouts*(port: SerialPort): tuple[readTimeout: int32, writeTimeout: int32] =
   ## Get the read and write timeouts for the serial port.
@@ -452,6 +449,8 @@ proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, st
            handshaking: Handshake = Handshake.None, readTimeout = TIMEOUT_INFINITE,
            writeTimeout = TIMEOUT_INFINITE, dtrEnable = false, rtsEnable = false) =
   ## Open the serial port for reading and writing.
+  ##
+  ## The `readTimeout` and `writeTimeout` are in milliseconds.
   if port.isOpen():
     raise newException(InvalidSerialPortStateError, "Serial port is already open.")
 
@@ -459,38 +458,36 @@ proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, st
   if tempHandle == -1:
     raiseOSError(osLastError())
 
-  # Check the opened port is a serial port
-  if isatty(tempHandle) != 1:
-    discard posix.close(tempHandle)
-    raiseOSError(osLastError())
-
-  var settings: Termios
-  if tcGetAttr(tempHandle, addr settings) == -1:
-    discard posix.close(tempHandle)
-    raiseOSError(osLastError())
-
   try:
+    # Check the opened port is a serial port
+    if isatty(tempHandle) != 1:
+      raiseOSError(osLastError())
+
+    var settings: Termios
+    if tcGetAttr(tempHandle, addr settings) == -1:
+      raiseOSError(osLastError())
+
     setSpeed(addr settings, baudRate)
-  except:
+
+    settings.c_cflag = settings.c_cflag or (CLOCAL or CREAD)
+    settings.c_lflag = settings.c_lflag and (not (ICANON or ECHO or ECHOE or ISIG))
+    settings.c_oflag = settings.c_oflag and (not OPOST)
+
+    setParity(settings, parity)
+    setDataBits(settings, dataBits)
+    setStopBits(settings, stopBits)
+    setHandshaking(settings, handshaking)
+
+    port.readTimeout = readTimeout
+    port.writeTimeout = writeTimeout
+
+    if tcSetAttr(tempHandle, TCSANOW, addr settings) == -1:
+      raiseOSError(osLastError())
+
+    port.handle = FileHandle(tempHandle)
+  finally:
     discard posix.close(tempHandle)
-    raise
-
-  settings.c_cflag = settings.c_cflag or (CLOCAL or CREAD)
-  settings.c_lflag = settings.c_lflag and (not (ICANON or ECHO or ECHOE or ISIG))
-  settings.c_oflag = settings.c_oflag and (not OPOST)
-
-  setParity(settings, parity)
-  setDataBits(settings, dataBits)
-  setStopBits(settings, stopBits)
-  setHandshaking(settings, handshaking)
-
-  port.readTimeout = readTimeout
-  port.writeTimeout = writeTimeout
-
-  if tcSetAttr(tempHandle, TCSANOW, addr settings) == -1:
-    raiseOSError(osLastError())
-
-  port.handle = tempHandle
+    port.handle = InvalidFileHandle
 
 proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
   ## Read up to `len` bytes from the serial port into the buffer `buff`. This will return the actual number of bytes that were received.
@@ -505,7 +502,7 @@ proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
     FD_ZERO(selectSet)
     FD_SET(port.handle, selectSet)
 
-    timer.tv_usec = clong(port.readTimeout * 1000000)
+    timer.tv_usec = clong(port.readTimeout * 1000)
 
     let selected = select(cint(port.handle + 1), addr selectSet, nil, nil, addr timer)
 
@@ -541,7 +538,7 @@ proc write*(port: SerialPort, buff: pointer, len: int32): int32 =
     FD_ZERO(selectSet)
     FD_SET(port.handle, selectSet)
 
-    timer.tv_usec = clong(port.writeTimeout * 1000000)
+    timer.tv_usec = clong(port.writeTimeout * 1000)
 
     let selected = select(cint(port.handle + 1), nil, addr selectSet, nil, addr timer)
 
@@ -579,4 +576,4 @@ proc close*(port: SerialPort) =
       port.flush()
     finally:
       discard posix.close(port.handle)
-      port.handle = INVALID_HANDLE_VALUE
+      port.handle = InvalidFileHandle

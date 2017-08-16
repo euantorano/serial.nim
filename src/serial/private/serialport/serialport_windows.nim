@@ -14,19 +14,19 @@ const
   FileTemplateHandle: Handle = Handle(0)
 
 type
-  SerialPort* = ref SerialPortObj
-    ## A serial port type used to read from and write to serial ports.
-
-  SerialPortObj = object
+  SerialPortBase[THandle] = ref object of RootObj
     name*: string
     handshake: Handshake
-    handle: Handle
+    handle: THandle
     commProp: CommProp
     comStat: ComStat
     dcb: DCB
     commTimeouts: COMMTIMEOUTS
     isRtsEnabled: bool
     isInBreak: bool
+
+  SerialPort* = ref object of SerialPortBase[FileHandle]
+    ## A serial port type used to read from and write to serial ports.
 
 proc newSerialPort*(portName: string): SerialPort =
   ## Initialise a new serial port, ready to open.
@@ -35,12 +35,12 @@ proc newSerialPort*(portName: string): SerialPort =
 
   result = SerialPort(
     name: portName,
-    handle: INVALID_HANDLE_VALUE
+    handle: InvalidFileHandle
   )
 
 proc isOpen*(port: SerialPort): bool =
   ## Check whether the serial port is currently open.
-  result = port.handle != INVALID_HANDLE_VALUE
+  result = port.handle != InvalidFileHandle
 
 proc initDcb(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, stopBits: StopBits, handshaking: Handshake) =
   if GetCommState(port.handle, addr port.dcb) == 0:
@@ -121,7 +121,7 @@ proc getTimeouts*(port: SerialPort): tuple[readTimeout: int32, writeTimeout: int
   )
 
 proc setTimeouts*(port: SerialPort, readTimeout: int32, writeTimeout: int32) =
-  ## Set the read and write timeouts for the serial port.
+  ## Set the read and write timeouts for the serial port. Timeouts are in milliseconds.
   if not port.isOpen():
     raise newException(InvalidSerialPortStateError, "Cannot set timeouts whilst the serial port is closed")
 
@@ -465,7 +465,7 @@ proc initPort(port: SerialPort, tempHandle: Handle, baudRate: int32, parity: Par
     if not (fileType in {DWORD(FileType.Character), DWORD(FileType.Unknown)}):
       raise newException(InvalidSerialPortError, "Serial port '" & port.name & "' is not a valid COM port.")
 
-    port.handle = tempHandle
+    port.handle = FileHandle(tempHandle)
 
     var pinStatus: int32
 
@@ -497,13 +497,15 @@ proc initPort(port: SerialPort, tempHandle: Handle, baudRate: int32, parity: Par
     discard SetCommMask(port.handle, ALL_EVENTS)
   except:
     discard closeHandle(tempHandle)
-    port.handle = INVALID_HANDLE_VALUE
+    port.handle = InvalidFileHandle
     raise
 
 proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, stopBits: StopBits,
            handshaking: Handshake = Handshake.None, readTimeout = TIMEOUT_INFINITE,
            writeTimeout = TIMEOUT_INFINITE, dtrEnable = false, rtsEnable = false) =
   ## Open the serial port for reading and writing.
+  ##
+  ## The `readTimeout` and `writeTimeout` are in milliseconds.
   if port.isOpen():
     raise newException(InvalidSerialPortStateError, "Serial port is already open.")
 
@@ -591,8 +593,4 @@ proc close*(port: SerialPort) =
         port.discardOutBuffer()
   finally:
     discard closeHandle(port.handle)
-
-    when port is SerialPort:
-      port.handle = INVALID_HANDLE_VALUE
-    else:
-      port.handle = AsyncFD(INVALID_HANDLE_VALUE)
+    port.handle = InvalidFileHandle

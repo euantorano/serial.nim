@@ -63,10 +63,10 @@ when isMainModule:
 
   echo ""
 
-  let port = newSerialPort("/dev/ttyS0")
-  port.open(38400, Parity.None, 8, StopBits.One, readTimeout = 5, writeTimeout = 1)
+  let port = newSerialPort("COM5")
+  port.open(38400, Parity.None, 8, StopBits.One, readTimeout = 5000, writeTimeout = 1000)
 
-  echo "Opened port /dev/ttyS0"
+  echo "Opened port COM5"
 
   echo "Baud Rate: ", port.baudRate
   echo "Parity: ", port.parity
@@ -98,12 +98,12 @@ when isMainModule:
 
   port.close()
 
-  echo "Closed port /dev/ttyS0"
+  echo "Closed port COM5"
 
   echo "Using stream"
 
-  let portStream = newSerialStream("/dev/ttyS0", 38400, Parity.None, 8, StopBits.One, buffered=true)
-  echo "Opened /dev/ttyS0 using stream"
+  let portStream = newSerialStream("COM5", 38400, Parity.None, 8, StopBits.One, buffered=true)
+  echo "Opened COM5 using stream"
 
   portStream.writeLine("AT")
 
