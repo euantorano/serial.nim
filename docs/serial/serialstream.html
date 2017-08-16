@@ -1241,7 +1241,7 @@ function main() {
     title="newSerialStream(portName: string; baudRate: int32; parity: Parity; dataBits: byte;
                 stopBits: StopBits; handshaking: Handshake = Handshake.None;
                 readTimeout = TIMEOUT_INFINITE; writeTimeout = TIMEOUT_INFINITE;
-                dtrEnable = false; buffered = false): SerialStream"><wbr />new<wbr />Serial<wbr />Stream<span class="attachedType" style="visibility:hidden">SerialStream</span></a></li>
+                dtrEnable = false; rtsEnable = false; buffered = false): SerialStream"><wbr />new<wbr />Serial<wbr />Stream<span class="attachedType" style="visibility:hidden">SerialStream</span></a></li>
   <li><a class="reference" href="#getTimeouts,SerialStream"
     title="getTimeouts(stream: SerialStream): tuple[readTimeout: int32, writeTimeout: int32]"><wbr />get<wbr />Timeouts<span class="attachedType" style="visibility:hidden">SerialStream</span></a></li>
   <li><a class="reference" href="#setTimeouts,SerialStream,int32,int32"
@@ -1346,9 +1346,9 @@ class="link-seesrc" target="_blank">Source</a>
                     <span class="Identifier">stopBits</span><span class="Other">:</span> <span class="Identifier">StopBits</span><span class="Other">;</span> <span class="Identifier">handshaking</span><span class="Other">:</span> <span class="Identifier">Handshake</span> <span class="Other">=</span> <span class="Identifier">Handshake</span><span class="Other">.</span><span class="Identifier">None</span><span class="Other">;</span>
                     <span class="Identifier">readTimeout</span> <span class="Other">=</span> <span class="Identifier">TIMEOUT_INFINITE</span><span class="Other">;</span>
                     <span class="Identifier">writeTimeout</span> <span class="Other">=</span> <span class="Identifier">TIMEOUT_INFINITE</span><span class="Other">;</span> <span class="Identifier">dtrEnable</span> <span class="Other">=</span> <span class="Identifier">false</span><span class="Other">;</span>
-                    <span class="Identifier">buffered</span> <span class="Other">=</span> <span class="Identifier">false</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">SerialStream</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span>
-    <span class="Identifier">InvalidSerialPortError</span><span class="Other">,</span> <span class="Identifier">InvalidSerialPortStateError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">,</span> <span class="Other">,</span>
-    <span class="Identifier">InvalidDataBitsError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+                    <span class="Identifier">rtsEnable</span> <span class="Other">=</span> <span class="Identifier">false</span><span class="Other">;</span> <span class="Identifier">buffered</span> <span class="Other">=</span> <span class="Identifier">false</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">SerialStream</span> <span class="Other pragmabegin">{.</span><div class="pragma">
+    <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortError</span><span class="Other">,</span> <span class="Identifier">InvalidSerialPortStateError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">,</span> <span class="Other">]</span><span class="Other">,</span>
+    <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Create a new serial stream for the given serial port with name <cite>portName</cite> and the given settings.
 &nbsp;&nbsp;<a
@@ -1368,7 +1368,7 @@ class="link-seesrc" target="_blank">Source</a>
 
 </dd>
 <dt id="setTimeouts"><a name="setTimeouts,SerialStream,int32,int32"></a><pre><span class="Keyword">proc</span> <span class="Identifier">setTimeouts</span><span class="Other">(</span><span class="Identifier">stream</span><span class="Other">:</span> <span class="Identifier">SerialStream</span><span class="Other">;</span> <span class="Identifier">readTimeout</span><span class="Other">:</span> <span class="Identifier">int32</span><span class="Other">;</span> <span class="Identifier">writeTimeout</span><span class="Other">:</span> <span class="Identifier">int32</span><span class="Other">)</span> <span class="Other pragmabegin">{.</span><div class="pragma">
-    <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+    <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Set the read and write timeouts for the serial port.
 &nbsp;&nbsp;<a
@@ -1418,7 +1418,7 @@ class="link-seesrc" target="_blank">Source</a>
 
 </dd>
 <dt id="stopBits="><a name="stopBits=,SerialStream,StopBits"></a><pre><span class="Keyword">proc</span> <span class="Identifier">stopBits=</span><span class="Other">(</span><span class="Identifier">stream</span><span class="Other">:</span> <span class="Identifier">SerialStream</span><span class="Other">;</span> <span class="Identifier">stopBits</span><span class="Other">:</span> <span class="Identifier">StopBits</span><span class="Other">)</span> <span class="Other pragmabegin">{.</span><div class="pragma">
-    <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+    <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">,</span> <span class="Identifier">InvalidStopBitsError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Set the stop bits for the serial port.
 &nbsp;&nbsp;<a
@@ -1428,7 +1428,7 @@ class="link-seesrc" target="_blank">Source</a>
 
 </dd>
 <dt id="stopBits"><a name="stopBits,SerialStream"></a><pre><span class="Keyword">proc</span> <span class="Identifier">stopBits</span><span class="Other">(</span><span class="Identifier">stream</span><span class="Other">:</span> <span class="Identifier">SerialStream</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">StopBits</span> <span class="Other pragmabegin">{.</span><div class="pragma">
-    <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+    <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">,</span> <span class="Identifier">InvalidStopBitsError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Get the stop bits for the serial port.
 &nbsp;&nbsp;<a
@@ -1438,7 +1438,7 @@ class="link-seesrc" target="_blank">Source</a>
 
 </dd>
 <dt id="dataBits="><a name="dataBits=,SerialStream,byte"></a><pre><span class="Keyword">proc</span> <span class="Identifier">dataBits=</span><span class="Other">(</span><span class="Identifier">stream</span><span class="Other">:</span> <span class="Identifier">SerialStream</span><span class="Other">;</span> <span class="Identifier">dataBits</span><span class="Other">:</span> <span class="Identifier">byte</span><span class="Other">)</span> <span class="Other pragmabegin">{.</span><div class="pragma">
-    <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">,</span> <span class="Identifier">InvalidDataBitsError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+    <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Set the number of data bits for the serial port.
 &nbsp;&nbsp;<a
@@ -1447,8 +1447,8 @@ class="link-seesrc" target="_blank">Source</a>
 <a href="/edit/devel/src/serial/serialstream.nim#L164" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
-<dt id="dataBits"><a name="dataBits,SerialStream"></a><pre><span class="Keyword">proc</span> <span class="Identifier">dataBits</span><span class="Other">(</span><span class="Identifier">stream</span><span class="Other">:</span> <span class="Identifier">SerialStream</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">byte</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">,</span>
-    <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dt id="dataBits"><a name="dataBits,SerialStream"></a><pre><span class="Keyword">proc</span> <span class="Identifier">dataBits</span><span class="Other">(</span><span class="Identifier">stream</span><span class="Other">:</span> <span class="Identifier">SerialStream</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">byte</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">]</span><span class="Other">,</span>
+                                        <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Get the number of data bits for the serial port.
 &nbsp;&nbsp;<a
@@ -1458,7 +1458,7 @@ class="link-seesrc" target="_blank">Source</a>
 
 </dd>
 <dt id="baudRate="><a name="baudRate=,SerialStream,int32"></a><pre><span class="Keyword">proc</span> <span class="Identifier">baudRate=</span><span class="Other">(</span><span class="Identifier">stream</span><span class="Other">:</span> <span class="Identifier">SerialStream</span><span class="Other">;</span> <span class="Identifier">baudRate</span><span class="Other">:</span> <span class="Identifier">int32</span><span class="Other">)</span> <span class="Other pragmabegin">{.</span><div class="pragma">
-    <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">,</span> <span class="Identifier">InvalidBaudRateError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+    <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">,</span> <span class="Identifier">InvalidBaudRateError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Set the baud rate for the serial port.
 &nbsp;&nbsp;<a
@@ -1467,8 +1467,8 @@ class="link-seesrc" target="_blank">Source</a>
 <a href="/edit/devel/src/serial/serialstream.nim#L172" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
-<dt id="baudRate"><a name="baudRate,SerialStream"></a><pre><span class="Keyword">proc</span> <span class="Identifier">baudRate</span><span class="Other">(</span><span class="Identifier">stream</span><span class="Other">:</span> <span class="Identifier">SerialStream</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">int32</span> <span class="Other pragmabegin">{.</span><div class="pragma">
-    <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">,</span> <span class="Identifier">InvalidBaudRateError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dt id="baudRate"><a name="baudRate,SerialStream"></a><pre><span class="Keyword">proc</span> <span class="Identifier">baudRate</span><span class="Other">(</span><span class="Identifier">stream</span><span class="Other">:</span> <span class="Identifier">SerialStream</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">int32</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">]</span><span class="Other">,</span>
+    <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Get the baud rate for the serial port.
 &nbsp;&nbsp;<a
@@ -1487,8 +1487,8 @@ class="link-seesrc" target="_blank">Source</a>
 <a href="/edit/devel/src/serial/serialstream.nim#L180" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
-<dt id="parity"><a name="parity,SerialStream"></a><pre><span class="Keyword">proc</span> <span class="Identifier">parity</span><span class="Other">(</span><span class="Identifier">stream</span><span class="Other">:</span> <span class="Identifier">SerialStream</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Parity</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">,</span>
-    <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dt id="parity"><a name="parity,SerialStream"></a><pre><span class="Keyword">proc</span> <span class="Identifier">parity</span><span class="Other">(</span><span class="Identifier">stream</span><span class="Other">:</span> <span class="Identifier">SerialStream</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Parity</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">]</span><span class="Other">,</span>
+                                        <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Get the parity for the serial port.
 &nbsp;&nbsp;<a
@@ -1527,8 +1527,8 @@ class="link-seesrc" target="_blank">Source</a>
 <a href="/edit/devel/src/serial/serialstream.nim#L196" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
-<dt id="dtrEnable"><a name="dtrEnable,SerialStream"></a><pre><span class="Keyword">proc</span> <span class="Identifier">dtrEnable</span><span class="Other">(</span><span class="Identifier">stream</span><span class="Other">:</span> <span class="Identifier">SerialStream</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma">
-    <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dt id="dtrEnable"><a name="dtrEnable,SerialStream"></a><pre><span class="Keyword">proc</span> <span class="Identifier">dtrEnable</span><span class="Other">(</span><span class="Identifier">stream</span><span class="Other">:</span> <span class="Identifier">SerialStream</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">]</span><span class="Other">,</span>
+    <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Check whether the data terminal ready signal is currently set.
 &nbsp;&nbsp;<a
@@ -1547,8 +1547,8 @@ class="link-seesrc" target="_blank">Source</a>
 <a href="/edit/devel/src/serial/serialstream.nim#L204" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
-<dt id="rtsEnable"><a name="rtsEnable,SerialStream"></a><pre><span class="Keyword">proc</span> <span class="Identifier">rtsEnable</span><span class="Other">(</span><span class="Identifier">stream</span><span class="Other">:</span> <span class="Identifier">SerialStream</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma">
-    <span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">,</span> <span class="Identifier">OSError</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
+<dt id="rtsEnable"><a name="rtsEnable,SerialStream"></a><pre><span class="Keyword">proc</span> <span class="Identifier">rtsEnable</span><span class="Other">(</span><span class="Identifier">stream</span><span class="Other">:</span> <span class="Identifier">SerialStream</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span class="Other pragmabegin">{.</span><div class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Identifier">InvalidSerialPortStateError</span><span class="Other">]</span><span class="Other">,</span>
+    <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></div><span class="Other pragmaend">.}</span></pre></dt>
 <dd>
 Check whether the ready to send signal is currently set.
 &nbsp;&nbsp;<a
@@ -1587,7 +1587,7 @@ class="link-seesrc" target="_blank">Source</a>
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small>Made with Nim. Generated: 2017-08-15 20:57:37 UTC</small>
+        <small>Made with Nim. Generated: 2017-08-16 09:53:20 UTC</small>
       </div>
     </div>
   </div>

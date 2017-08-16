@@ -1,4 +1,5 @@
 TIMEOUT_INFINITE	serialport_common.html#TIMEOUT_INFINITE	serialport_common : TIMEOUT_INFINITE	
+InvalidFileHandle	serialport_common.html#InvalidFileHandle	serialport_common : InvalidFileHandle	
 Parity	serialport_common.html#Parity	serialport_common : Parity	
 Handshake	serialport_common.html#Handshake	serialport_common : Handshake	
 StopBits	serialport_common.html#StopBits	serialport_common : StopBits	

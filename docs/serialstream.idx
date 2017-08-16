@@ -1,7 +1,7 @@
 BufferSize	serialstream.html#BufferSize	serialstream : BufferSize	
 SerialStream	serialstream.html#SerialStream	serialstream : SerialStream	
 newSerialStream	serialstream.html#newSerialStream,SerialPort	serialstream : newSerialStream(p: SerialPort; buffered = false): SerialStream	
-newSerialStream	serialstream.html#newSerialStream,string,int32,Parity,byte,StopBits,Handshake	serialstream : newSerialStream(portName: string; baudRate: int32; parity: Parity; dataBits: byte;\n                stopBits: StopBits; handshaking: Handshake = Handshake.None;\n                readTimeout = TIMEOUT_INFINITE; writeTimeout = TIMEOUT_INFINITE;\n                dtrEnable = false; buffered = false): SerialStream	
+newSerialStream	serialstream.html#newSerialStream,string,int32,Parity,byte,StopBits,Handshake	serialstream : newSerialStream(portName: string; baudRate: int32; parity: Parity; dataBits: byte;\n                stopBits: StopBits; handshaking: Handshake = Handshake.None;\n                readTimeout = TIMEOUT_INFINITE; writeTimeout = TIMEOUT_INFINITE;\n                dtrEnable = false; rtsEnable = false; buffered = false): SerialStream	
 getTimeouts	serialstream.html#getTimeouts,SerialStream	serialstream : getTimeouts(stream: SerialStream): tuple[readTimeout: int32, writeTimeout: int32]	
 setTimeouts	serialstream.html#setTimeouts,SerialStream,int32,int32	serialstream : setTimeouts(stream: SerialStream; readTimeout: int32; writeTimeout: int32)	
 isCarrierHolding	serialstream.html#isCarrierHolding,SerialStream	serialstream : isCarrierHolding(stream: SerialStream): bool	

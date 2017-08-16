@@ -23,7 +23,7 @@ rtsEnable=	serialport.html#rtsEnable=,SerialPort,bool	serialport : rtsEnable=(po
 rtsEnable	serialport.html#rtsEnable,SerialPort	serialport : rtsEnable(port: SerialPort): bool	
 handshake=	serialport.html#handshake=,SerialPort,Handshake	serialport : handshake=(port: SerialPort; handshake: Handshake)	
 handshake	serialport.html#handshake,SerialPort	serialport : handshake(port: SerialPort): Handshake	
-open	serialport.html#open,SerialPort,int32,Parity,byte,StopBits,Handshake	serialport : open(port: SerialPort; baudRate: int32; parity: Parity; dataBits: byte;\n     stopBits: StopBits; handshaking: Handshake = Handshake.None;\n     readTimeout = TIMEOUT_INFINITE; writeTimeout = TIMEOUT_INFINITE;\n     dtrEnable = false)	
+open	serialport.html#open,SerialPort,int32,Parity,byte,StopBits,Handshake	serialport : open(port: SerialPort; baudRate: int32; parity: Parity; dataBits: byte;\n     stopBits: StopBits; handshaking: Handshake = Handshake.None;\n     readTimeout = TIMEOUT_INFINITE; writeTimeout = TIMEOUT_INFINITE;\n     dtrEnable = false; rtsEnable = false)	
 read	serialport.html#read,SerialPort,pointer,int32	serialport : read(port: SerialPort; buff: pointer; len: int32): int32	
 write	serialport.html#write,SerialPort,pointer,int32	serialport : write(port: SerialPort; buff: pointer; len: int32): int32	
 flush	serialport.html#flush,SerialPort	serialport : flush(port: SerialPort)	
