@@ -22,7 +22,7 @@ type
   SerialPortBase[THandle] = ref object of RootObj
     name*: string
     handshake: Handshake
-    handle: FileHandle
+    handle: THandle
     readTimeout: int32
     writeTimeout: int32
 
