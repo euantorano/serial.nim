@@ -489,6 +489,8 @@ proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, st
     discard posix.close(tempHandle)
     port.handle = InvalidFileHandle
 
+    raise
+
 proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
   ## Read up to `len` bytes from the serial port into the buffer `buff`. This will return the actual number of bytes that were received.
   if not port.isOpen():
