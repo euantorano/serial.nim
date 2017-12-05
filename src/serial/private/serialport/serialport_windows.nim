@@ -498,6 +498,7 @@ proc initPort(port: SerialPort, tempHandle: Handle, baudRate: int32, parity: Par
   except:
     discard closeHandle(tempHandle)
     port.handle = InvalidFileHandle
+    
     raise
 
 proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, stopBits: StopBits,
