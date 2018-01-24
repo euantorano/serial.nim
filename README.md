@@ -4,7 +4,7 @@ A library to work with serial ports using pure Nim.
 
 ## Installation
 
-`postgres` can be installed using Nimble:
+`serial` can be installed using Nimble:
 
 ```
 nimble install serial
