@@ -52,13 +52,9 @@ proc newAsyncSerialPort*(portName: string): AsyncSerialPort =
     handle: AsyncFD(InvalidFileHandle)
   )
 
-proc isOpen*(port: SerialPort): bool =
+proc isOpen*(port: SerialPort | AsyncSerialPort): bool =
   ## Check whether the serial port is currently open.
-  result = port.handle != InvalidFileHandle
-
-proc isOpen*(port: AsyncSerialPort): bool =
-  ## Check whether the serial port is currently open.
-  result = port.handle != AsyncFD(InvalidFileHandle)
+  result = FileHandle(port.handle) != InvalidFileHandle
 
 proc initDcb(port: SerialPort | AsyncSerialPort, baudRate: int32, parity: Parity, dataBits: byte, stopBits: StopBits, handshaking: Handshake) =
   if GetCommState(Handle(port.handle), addr port.dcb) == 0:
@@ -486,16 +482,16 @@ proc initPort(port: SerialPort | AsyncSerialPort, tempHandle: Handle, baudRate: 
     if not (fileType in {DWORD(FileType.Character), DWORD(FileType.Unknown)}):
       raise newException(InvalidSerialPortError, "Serial port '" & port.name & "' is not a valid COM port.")
 
-    when port is SerialPort:
-      port.handle = FileHandle(tempHandle)
-    else:
+    when port is AsyncSerialPort:
       port.handle = AsyncFD(tempHandle)
       register(port.handle)
       registered = true
+    else:
+      port.handle = FileHandle(tempHandle)
 
     var pinStatus: int32
 
-    if GetCommProperties(Handle(port.handle), addr port.commProp) == 0 or GetCommModemStatus(Handle(port.handle), addr pinStatus) == 0:
+    if GetCommProperties(tempHandle, addr port.commProp) == 0 or GetCommModemStatus(tempHandle, addr pinStatus) == 0:
       let errorCode = osLastError()
       if int32(errorCode) in {ERROR_INVALID_PARAMETER, ERROR_INVALID_HANDLE}:
         raise newException(InvalidSerialPortError, "Serial port '" & port.name & "' is not a valid COM port.")
@@ -515,22 +511,19 @@ proc initPort(port: SerialPort | AsyncSerialPort, tempHandle: Handle, baudRate: 
     if handshaking != Handshake.RequestToSend and handshaking != Handshake.RequestToSendXOnXOff:
       port.setRtsEnable(rtsEnable)
 
-    if GetCommTimeouts(Handle(port.handle), addr port.commTimeouts) == 0:
+    if GetCommTimeouts(tempHandle, addr port.commTimeouts) == 0:
       raiseOSError(osLastError())
 
     port.setTimeouts(readTimeout, writeTimeout)
 
-    discard SetCommMask(Handle(port.handle), ALL_EVENTS)
+    discard SetCommMask(tempHandle, ALL_EVENTS)
   except:
-    when port is SerialPort:
-      discard closeHandle(tempHandle)
-      port.handle = InvalidFileHandle
-    else:
+    when port is AsyncSerialPort:
       if registered:
         unregister(port.handle)
 
-      discard closeHandle(tempHandle)
-      port.handle = AsyncFD(InvalidFileHandle)
+    discard closeHandle(tempHandle)
+    port.handle = when port is AsyncSerialPort: AsyncFD(InvalidFileHandle) else: InvalidFileHandle
 
     raise
 
@@ -734,10 +727,8 @@ proc close*(port: SerialPort | AsyncSerialPort) =
         port.discardInBuffer()
         port.discardOutBuffer()
   finally:
-    when port is SerialPort:
-      discard closeHandle(port.handle)
-      port.handle = InvalidFileHandle
-    else:
+    when port is AsyncSerialPort:
       unregister(port.handle)
-      discard closeHandle(Handle(port.handle))
-      port.handle = AsyncFD(InvalidFileHandle)
+
+    discard closeHandle(Handle(port.handle))
+    port.handle = when port is AsyncSerialPort: AsyncFD(InvalidFileHandle) else: InvalidFileHandle
