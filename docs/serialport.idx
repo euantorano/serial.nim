@@ -1,30 +1,41 @@
 SerialPort	serialport.html#SerialPort	serialport : SerialPort	
+AsyncSerialPort	serialport.html#AsyncSerialPort	serialport : AsyncSerialPort	
 newSerialPort	serialport.html#newSerialPort,string	serialport : newSerialPort(portName: string): SerialPort	
-isOpen	serialport.html#isOpen,SerialPort	serialport : isOpen(port: SerialPort): bool	
-getTimeouts	serialport.html#getTimeouts,SerialPort	serialport : getTimeouts(port: SerialPort): tuple[readTimeout: int32, writeTimeout: int32]	
-setTimeouts	serialport.html#setTimeouts,SerialPort,int32,int32	serialport : setTimeouts(port: SerialPort; readTimeout: int32; writeTimeout: int32)	
-isCarrierHolding	serialport.html#isCarrierHolding,SerialPort	serialport : isCarrierHolding(port: SerialPort): bool	
-isCtsHolding	serialport.html#isCtsHolding,SerialPort	serialport : isCtsHolding(port: SerialPort): bool	
-isDsrHolding	serialport.html#isDsrHolding,SerialPort	serialport : isDsrHolding(port: SerialPort): bool	
-isRingHolding	serialport.html#isRingHolding,SerialPort	serialport : isRingHolding(port: SerialPort): bool	
-stopBits=	serialport.html#stopBits=,SerialPort,StopBits	serialport : stopBits=(port: SerialPort; stopBits: StopBits)	
-stopBits	serialport.html#stopBits,SerialPort	serialport : stopBits(port: SerialPort): StopBits	
-dataBits=	serialport.html#dataBits=,SerialPort,byte	serialport : dataBits=(port: SerialPort; dataBits: byte)	
-dataBits	serialport.html#dataBits,SerialPort	serialport : dataBits(port: SerialPort): byte	
-baudRate=	serialport.html#baudRate=,SerialPort,int32	serialport : baudRate=(port: SerialPort; baudRate: int32)	
-baudRate	serialport.html#baudRate,SerialPort	serialport : baudRate(port: SerialPort): int32	
-parity=	serialport.html#parity=,SerialPort,Parity	serialport : parity=(port: SerialPort; parity: Parity)	
-parity	serialport.html#parity,SerialPort	serialport : parity(port: SerialPort): Parity	
-breakStatus=	serialport.html#breakStatus=,SerialPort,bool	serialport : breakStatus=(port: SerialPort; shouldBreak: bool)	
-breakStatus	serialport.html#breakStatus,SerialPort	serialport : breakStatus(port: SerialPort): bool	
-dtrEnable=	serialport.html#dtrEnable=,SerialPort,bool	serialport : dtrEnable=(port: SerialPort; dtrEnabled: bool)	
-dtrEnable	serialport.html#dtrEnable,SerialPort	serialport : dtrEnable(port: SerialPort): bool	
-rtsEnable=	serialport.html#rtsEnable=,SerialPort,bool	serialport : rtsEnable=(port: SerialPort; rtsEnabled: bool)	
-rtsEnable	serialport.html#rtsEnable,SerialPort	serialport : rtsEnable(port: SerialPort): bool	
-handshake=	serialport.html#handshake=,SerialPort,Handshake	serialport : handshake=(port: SerialPort; handshake: Handshake)	
-handshake	serialport.html#handshake,SerialPort	serialport : handshake(port: SerialPort): Handshake	
+newAsyncSerialPort	serialport.html#newAsyncSerialPort,string	serialport : newAsyncSerialPort(portName: string): AsyncSerialPort	
+isOpen	serialport.html#isOpen,	serialport : isOpen(port: SerialPort | AsyncSerialPort): bool	
+getTimeouts	serialport.html#getTimeouts,	serialport : getTimeouts(port: SerialPort | AsyncSerialPort): tuple[readTimeout: int32,\n    writeTimeout: int32]	
+setTimeouts	serialport.html#setTimeouts,,int32,int32	serialport : setTimeouts(port: SerialPort | AsyncSerialPort; readTimeout: int32;\n            writeTimeout: int32)	
+isCarrierHolding	serialport.html#isCarrierHolding,	serialport : isCarrierHolding(port: SerialPort | AsyncSerialPort): bool	
+isCtsHolding	serialport.html#isCtsHolding,	serialport : isCtsHolding(port: SerialPort | AsyncSerialPort): bool	
+isDsrHolding	serialport.html#isDsrHolding,	serialport : isDsrHolding(port: SerialPort | AsyncSerialPort): bool	
+isRingHolding	serialport.html#isRingHolding,	serialport : isRingHolding(port: SerialPort | AsyncSerialPort): bool	
+stopBits=	serialport.html#stopBits=,,StopBits	serialport : stopBits=(port: SerialPort | AsyncSerialPort; stopBits: StopBits)	
+stopBits	serialport.html#stopBits,	serialport : stopBits(port: SerialPort | AsyncSerialPort): StopBits	
+dataBits=	serialport.html#dataBits=,,byte	serialport : dataBits=(port: SerialPort | AsyncSerialPort; dataBits: byte)	
+dataBits	serialport.html#dataBits,	serialport : dataBits(port: SerialPort | AsyncSerialPort): byte	
+baudRate=	serialport.html#baudRate=,,int32	serialport : baudRate=(port: SerialPort | AsyncSerialPort; baudRate: int32)	
+baudRate	serialport.html#baudRate,	serialport : baudRate(port: SerialPort | AsyncSerialPort): int32	
+parity=	serialport.html#parity=,,Parity	serialport : parity=(port: SerialPort | AsyncSerialPort; parity: Parity)	
+parity	serialport.html#parity,	serialport : parity(port: SerialPort | AsyncSerialPort): Parity	
+breakStatus=	serialport.html#breakStatus=,,bool	serialport : breakStatus=(port: SerialPort | AsyncSerialPort; shouldBreak: bool)	
+breakStatus	serialport.html#breakStatus,	serialport : breakStatus(port: SerialPort | AsyncSerialPort): bool	
+dtrEnable=	serialport.html#dtrEnable=,,bool	serialport : dtrEnable=(port: SerialPort | AsyncSerialPort; dtrEnabled: bool)	
+dtrEnable	serialport.html#dtrEnable,	serialport : dtrEnable(port: SerialPort | AsyncSerialPort): bool	
+rtsEnable=	serialport.html#rtsEnable=,,bool	serialport : rtsEnable=(port: SerialPort | AsyncSerialPort; rtsEnabled: bool)	
+rtsEnable	serialport.html#rtsEnable,	serialport : rtsEnable(port: SerialPort | AsyncSerialPort): bool	
+handshake=	serialport.html#handshake=,,Handshake	serialport : handshake=(port: SerialPort | AsyncSerialPort; handshake: Handshake)	
+handshake	serialport.html#handshake,	serialport : handshake(port: SerialPort | AsyncSerialPort): Handshake	
 open	serialport.html#open,SerialPort,int32,Parity,byte,StopBits,Handshake	serialport : open(port: SerialPort; baudRate: int32; parity: Parity; dataBits: byte;\n     stopBits: StopBits; handshaking: Handshake = Handshake.None;\n     readTimeout = TIMEOUT_INFINITE; writeTimeout = TIMEOUT_INFINITE;\n     dtrEnable = false; rtsEnable = false)	
+open	serialport.html#open,AsyncSerialPort,int32,Parity,byte,StopBits,Handshake	serialport : open(port: AsyncSerialPort; baudRate: int32; parity: Parity; dataBits: byte;\n     stopBits: StopBits; handshaking: Handshake = Handshake.None;\n     readTimeout = TIMEOUT_INFINITE; writeTimeout = TIMEOUT_INFINITE;\n     dtrEnable = false; rtsEnable = false)	
 read	serialport.html#read,SerialPort,pointer,int32	serialport : read(port: SerialPort; buff: pointer; len: int32): int32	
+read	serialport.html#read,AsyncSerialPort,pointer,int32	serialport : read(port: AsyncSerialPort; buff: pointer; len: int32): Future[int32]	
 write	serialport.html#write,SerialPort,pointer,int32	serialport : write(port: SerialPort; buff: pointer; len: int32): int32	
-flush	serialport.html#flush,SerialPort	serialport : flush(port: SerialPort)	
-close	serialport.html#close,SerialPort	serialport : close(port: SerialPort)	
+write	serialport.html#write,AsyncSerialPort,pointer,int32	serialport : write(port: AsyncSerialPort; buff: pointer; len: int32): Future[int32]	
+flush	serialport.html#flush,	serialport : flush(port: SerialPort | AsyncSerialPort)	
+close	serialport.html#close,	serialport : close(port: SerialPort | AsyncSerialPort)	
+read	serialport.html#read,SerialPort,string	serialport : read(port: SerialPort; buff: var string): int32	
+read	serialport.html#read,AsyncSerialPort,FutureVar[string]	serialport : read(port: AsyncSerialPort; buff: FutureVar[string]): Future[int32]	
+read	serialport.html#read,AsyncSerialPort,int32	serialport : read(port: AsyncSerialPort; size: int32): Future[string]	
+read	serialport.html#read,SerialPort,int32	serialport : read(port: SerialPort; size: int32): string	
+write	serialport.html#write,AsyncSerialPort,string	serialport : write(port: AsyncSerialPort; buff: string): Future[int32]	
+write	serialport.html#write,SerialPort,string	serialport : write(port: SerialPort; buff: string): int32	

@@ -1,3 +1,5 @@
+## This example shows writing to a serial port.
+
 import serial, sequtils, strutils, streams
 
 when isMainModule:
