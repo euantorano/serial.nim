@@ -12,4 +12,4 @@ srcDir = "src"
 requires "nim >= 0.16.0"
 
 task docs, "Build documentation":
-  exec "nim doc2 --project --index:on -o:docs/ src/serial.nim"
+  exec "nim doc --project --index:on -o:docs/ src/serial.nim"

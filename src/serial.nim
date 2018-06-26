@@ -32,8 +32,8 @@
 ##
 ##  var receiveBuffer = newString(1024)
 ##  while true:
-##    let numReceived = port.read(receiveBuffer, len(receiveBuffer))
-##    port.write(receiveBuffer, numReceived)
+##    let numReceived = port.read(receiveBuffer)
+##    discard port.write(receiveBuffer[0 ..< numReceived])
 ##
 ## Using the SerialStream
 ## -----------------

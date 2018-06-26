@@ -48,7 +48,7 @@ port.baudRate = 2400
 var receiveBuffer = newString(1024)
 while true:
   let numReceived = port.read(receiveBuffer)
-  discard port.write(addr receiveBuffer[0], numReceived)
+  discard port.write(receiveBuffer[0 ..< numReceived])
 ```
 
 ### Using the SerialStream
@@ -63,17 +63,13 @@ while true:
   port.writeLine(port.readLine())
 ```
 
-## Todo List
+## Features
 
 - [X] Basic port reading/writing for Windows/Posix
-    - [X] Posix
-    - [X] Windows
-- [X] Port setting control - baud rate, stop bits, databits, parity
-    - [X] Posix
-    - [X] Windows
+- [X] Port setting control - baud rate, stop bits, databits, parity, handshaking
 - [X] Port listing to list available serial ports
     - [X] Windows, using `SetupDiGetClassDevs`
     - [X] Mac, using I/O Kit
     - [X] Posix, by iteratng possible device files
 - [X] High level `SerialPortStream` that complies with the `streams` API
-- [ ] Async API using `asyncdispatch`
+- [X] Async API using `asyncdispatch` for reading from and writing to a port
