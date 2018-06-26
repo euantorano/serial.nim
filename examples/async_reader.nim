@@ -1,3 +1,5 @@
+## This example shows reading from a serial port asynchronously.
+
 import serial, sequtils, strutils, streams, asyncdispatch
 
 when isMainModule:
