@@ -47,8 +47,8 @@ port.baudRate = 2400
 
 var receiveBuffer = newString(1024)
 while true:
-  let numReceived = port.read(addr receiveBuffer[0], len(receiveBuffer))
-  port.write(addr receiveBuffer[0], numReceived)
+  let numReceived = port.read(addr receiveBuffer[0], int32 len(receiveBuffer))
+  discard port.write(addr receiveBuffer[0], numReceived)
 ```
 
 ### Using the SerialStream
