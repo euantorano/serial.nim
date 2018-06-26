@@ -14,10 +14,10 @@ const
   FileTemplateHandle: Handle = Handle(0)
 
 type
-  SerialPortBase[THandle] = ref object of RootObj
+  SerialPortBase[HandleType] = ref object of RootObj
     name*: string
     handshake: Handshake
-    handle: THandle
+    handle: HandleType
     commProp: CommProp
     comStat: ComStat
     dcb: DCB
@@ -491,14 +491,14 @@ proc initPort(port: SerialPort, tempHandle: Handle, baudRate: int32, parity: Par
 
     if GetCommTimeouts(port.handle, addr port.commTimeouts) == 0:
       raiseOSError(osLastError())
-      
+
     port.setTimeouts(readTimeout, writeTimeout)
 
     discard SetCommMask(port.handle, ALL_EVENTS)
   except:
     discard closeHandle(tempHandle)
     port.handle = InvalidFileHandle
-    
+
     raise
 
 proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, stopBits: StopBits,

@@ -47,7 +47,7 @@ port.baudRate = 2400
 
 var receiveBuffer = newString(1024)
 while true:
-  let numReceived = port.read(addr receiveBuffer[0], int32 len(receiveBuffer))
+  let numReceived = port.read(receiveBuffer)
   discard port.write(addr receiveBuffer[0], numReceived)
 ```
 
