@@ -19,10 +19,10 @@ var
   TIOCMBIS {.importc, header: "<termios.h>".}: cint
 
 type
-  SerialPortBase[THandle] = ref object of RootObj
+  SerialPortBase[HandleType] = ref object of RootObj
     name*: string
     handshake: Handshake
-    handle: THandle
+    handle: HandleType
     readTimeout: int32
     writeTimeout: int32
 
