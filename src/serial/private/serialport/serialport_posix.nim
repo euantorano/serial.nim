@@ -238,6 +238,36 @@ proc setSpeed(settings: ptr Termios, speed: int32) =
     baud = B19200
   of 38400:
     baud = B38400
+  of 57600:
+    baud = B57600
+  of 115200:
+    baud = B115200
+  of 230400:
+    baud = B230400
+  of 460800:
+    baud = B460800
+  of 500000:
+    baud = B500000
+  of 576000:
+    baud = B576000
+  of 921600:
+    baud = B921600
+  of 1000000:
+    baud = B1000000
+  of 1152000:
+    baud = B1152000
+  of 1500000:
+    baud = B1500000
+  of 2000000:
+    baud = B2000000
+  of 2500000:
+    baud = B2500000
+  of 3000000:
+    baud = B3000000
+  of 3500000:
+    baud = B3500000
+  of 4000000:
+    baud = B4000000
   else:
     raise newException(InvalidBaudRateError, "Unsupported baud rate '" & $speed & "'")
 
@@ -304,6 +334,36 @@ proc baudRate*(port: SerialPort | AsyncSerialPort): int32 =
     result = 19200
   elif speed == B38400:
     result = 38400
+  elif speed == B57600:
+    result = 57600
+  elif speed == B115200:
+    result = 115200
+  elif speed == B230400:
+    result = 230400
+  elif speed == B460800:
+    result = 460800
+  elif speed == B500000:
+    result = 500000
+  elif speed == B576000:
+    result = 576000
+  elif speed == B921600:
+    result = 921600
+  elif speed == B1000000:
+    result = 1000000
+  elif speed == B1152000:
+    result = 1152000
+  elif speed == B1500000:
+    result = 1500000
+  elif speed == B2000000:
+    result = 2000000
+  elif speed == B2500000:
+    result = 2500000
+  elif speed == B3000000:
+    result = 3000000
+  elif speed == B3500000:
+    result = 3500000
+  elif speed == B4000000:
+    result = 4000000
   else:
     raise newException(InvalidBaudRateError, "Unknown baud rate with value: " & $speed)
 
