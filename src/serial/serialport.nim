@@ -9,7 +9,7 @@ else:
 
 proc read*(port: SerialPort, buff: var string): int32 =
   ## Read from the serial port into the buffer `buff`. This will return the actual number of bytes that were received.
-  if isNil(buff) or len(buff) == 0:
+  if len(buff) == 0:
     return 0
 
   result = port.read(addr buff[0], int32(len(buff)))
@@ -18,7 +18,7 @@ proc read*(port: AsyncSerialPort, buff: FutureVar[string]): Future[int32] {.asyn
   ## Read from the serial port into the buffer `buff`. This will return the actual number of bytes that were received.
   var mbuff = buff.mget()
 
-  if isNil(mbuff) or len(mbuff) == 0:
+  if len(mbuff) == 0:
     return 0
 
   result = await port.read(addr mbuff[0], int32(len(mbuff)))
@@ -44,7 +44,7 @@ proc read*(port: SerialPort | AsyncSerialPort, size: int32): Future[string] {.mu
 
 proc write*(port: SerialPort | AsyncSerialPort, buff: string): Future[int32] {.multisync.} =
   ## Write the data to the serialport `port` from the buffer `buff`. This will return the number of bytes that were written.
-  if isNil(buff) or len(buff) == 0:
+  if len(buff) == 0:
     return 0
 
   var copy = buff
