@@ -203,6 +203,20 @@ proc dataBits*(port: SerialPort | AsyncSerialPort): byte =
   else:
     result = 5
 
+when defined(macosx):
+  const B460800 = 460800
+  const B500000 = 500000
+  const B576000 = 576000
+  const B921600 = 921600
+  const B1000000 = 1000000
+  const B1152000 = 1152000
+  const B1500000 = 1500000
+  const B2000000 = 2000000
+  const B2500000 = 2500000
+  const B3000000 = 3000000
+  const B3500000 = 3500000
+  const B4000000 = 4000000
+    
 proc setSpeed(settings: ptr Termios, speed: int32) =
   var baud: Speed
   case speed
