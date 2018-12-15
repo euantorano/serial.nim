@@ -203,19 +203,39 @@ proc dataBits*(port: SerialPort | AsyncSerialPort): byte =
   else:
     result = 5
 
-when defined(macosx):
-  const B460800 = 460800
-  const B500000 = 500000
-  const B576000 = 576000
-  const B921600 = 921600
-  const B1000000 = 1000000
-  const B1152000 = 1152000
-  const B1500000 = 1500000
-  const B2000000 = 2000000
-  const B2500000 = 2500000
-  const B3000000 = 3000000
-  const B3500000 = 3500000
-  const B4000000 = 4000000
+# these constants should be in termios.h
+# but some higher values are not present on 
+# certain implementations.
+when not declared(B57600):
+  const B57600   = 0o010001
+when not declared(B115200):
+  const B115200  = 0o010002
+when not declared(B230400):
+  const B230400  = 0o010003
+when not declared(B460800):
+  const B460800  = 0o010004
+when not declared(B500000):
+  const B500000  = 0o010005
+when not declared(B576000):
+  const B576000  = 0o010006
+when not declared(B921600):
+  const B921600  = 0o010007
+when not declared(B1000000):
+  const B1000000 = 0o010010
+when not declared(B1152000):
+  const B1152000 = 0o010011
+when not declared(B1500000):
+  const B1500000 = 0o010012
+when not declared(B2000000):
+  const B2000000 = 0o010013
+when not declared(B2500000):
+  const B2500000 = 0o010014
+when not declared(B3000000):
+  const B3000000 = 0o010015
+when not declared(B3500000):
+  const B3500000 = 0o010016
+when not declared(B4000000):
+  const B4000000 = 0o010017
     
 proc setSpeed(settings: ptr Termios, speed: int32) =
   var baud: Speed
@@ -615,17 +635,23 @@ proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
   if not port.isOpen():
     raise newException(InvalidSerialPortStateError, "Port must be open in order to read from it")
 
-  if port.readTimeout > 0'i32:
+  if port.readTimeout != 0'i32:
     var
       selectSet: TFdSet
       timer: Timeval
+      ptrTimer: ptr Timeval
 
     FD_ZERO(selectSet)
     FD_SET(port.handle, selectSet)
 
     timer.tv_usec = clong(port.readTimeout * 1000)
+    
+    if port.readTimeout < 0:
+      ptrTimer = nil
+    else:
+      ptrTimer = addr timer
 
-    let selected = select(cint(port.handle + 1), addr selectSet, nil, nil, addr timer)
+    let selected = select(cint(port.handle + 1), addr selectSet, nil, nil, ptrTimer)
 
     case selected
     of -1:
@@ -676,17 +702,23 @@ proc write*(port: SerialPort, buff: pointer, len: int32): int32 =
   if not port.isOpen():
     raise newException(InvalidSerialPortStateError, "Port must be open in order to write to it")
 
-  if port.writeTimeout > 0'i32:
+  if port.writeTimeout != 0'i32:
     var
       selectSet: TFdSet
       timer: Timeval
+      ptrTimer: ptr Timeval
 
     FD_ZERO(selectSet)
     FD_SET(port.handle, selectSet)
 
     timer.tv_usec = clong(port.writeTimeout * 1000)
+    
+    if port.writeTimeout < 0:
+      ptrTimer = nil
+    else:
+      ptrTimer = addr timer
 
-    let selected = select(cint(port.handle + 1), nil, addr selectSet, nil, addr timer)
+    let selected = select(cint(port.handle + 1), nil, addr selectSet, nil, ptrTimer)
 
     case selected
     of -1:
