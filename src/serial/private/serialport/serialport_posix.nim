@@ -204,7 +204,7 @@ proc dataBits*(port: SerialPort | AsyncSerialPort): byte =
     result = 5
 
 # these constants should be in termios.h
-# but some higher values are not presnt on 
+# but some higher values are not present on 
 # certain implementations.
 when not declared(B57600):
   const B57600   = 0o010001
