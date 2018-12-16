@@ -206,37 +206,23 @@ proc dataBits*(port: SerialPort | AsyncSerialPort): byte =
 # these constants should be in termios.h
 # but some higher values are not present on 
 # certain implementations.
-when not declared(B57600):
+when defined(macosx):
   const B57600   = 0o010001
-when not declared(B115200):
   const B115200  = 0o010002
-when not declared(B230400):
   const B230400  = 0o010003
-when not declared(B460800):
   const B460800  = 0o010004
-when not declared(B500000):
   const B500000  = 0o010005
-when not declared(B576000):
   const B576000  = 0o010006
-when not declared(B921600):
   const B921600  = 0o010007
-when not declared(B1000000):
   const B1000000 = 0o010010
-when not declared(B1152000):
   const B1152000 = 0o010011
-when not declared(B1500000):
   const B1500000 = 0o010012
-when not declared(B2000000):
   const B2000000 = 0o010013
-when not declared(B2500000):
   const B2500000 = 0o010014
-when not declared(B3000000):
   const B3000000 = 0o010015
-when not declared(B3500000):
   const B3500000 = 0o010016
-when not declared(B4000000):
   const B4000000 = 0o010017
-    
+
 proc setSpeed(settings: ptr Termios, speed: int32) =
   var baud: Speed
   case speed
@@ -682,7 +668,7 @@ proc read*(port: AsyncSerialPort, buff: pointer, len: int32): Future[int32] =
 
   proc cb(fd: AsyncFD): bool =
       result = true
-      let res = read(cint(fd), cast[cstring](buff), cint(len))
+      let res = posix.read(cint(fd), cast[cstring](buff), cint(len))
       if res < 0:
         let lastError = osLastError()
         if int32(lastError) != EAGAIN:
@@ -692,8 +678,7 @@ proc read*(port: AsyncSerialPort, buff: pointer, len: int32): Future[int32] =
       else:
         retFuture.complete(int32(res))
 
-  if not cb(port.handle):
-    addRead(port.handle, cb)
+  addRead(port.handle, cb)
 
   return retFuture
 
@@ -762,8 +747,7 @@ proc write*(port: AsyncSerialPort, buff: pointer, len: int32): Future[int32] =
     else:
       retFuture.complete(int32(res))
 
-  if not cb(port.handle):
-    addWrite(port.handle, cb)
+  addWrite(port.handle, cb)
 
   return retFuture
 
