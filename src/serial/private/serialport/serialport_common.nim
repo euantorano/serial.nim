@@ -33,7 +33,7 @@ type
 
   TimeoutError* = object of IOError
 
-  InvalidSerialPortStateError* = object of Exception
+  InvalidSerialPortStateError* = object of IOError
 
   InvalidBaudRateError* = object of Exception
 
