@@ -1,7 +1,5 @@
 ## Common types shared by all serialport implementations.
 
-import events
-
 const
   TIMEOUT_INFINITE* = -1'i32
   InvalidFileHandle* = FileHandle(-1)
