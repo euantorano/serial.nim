@@ -22,7 +22,7 @@ requires "serial >= 1.0.0"
 
 ## Usage
 
-There are two examples in the `examples` directory, showing reading from and writing to a serialport.
+There are some examples in the `examples` directory, showing reading from and writing to a serialport.
 
 ### Listing serial ports
 
@@ -65,11 +65,11 @@ while true:
 
 ## Features
 
-- [X] Basic port reading/writing for Windows/Posix
-- [X] Port setting control - baud rate, stop bits, databits, parity, handshaking
-- [X] Port listing to list available serial ports
-    - [X] Windows, using `SetupDiGetClassDevs`
-    - [X] Mac, using I/O Kit
-    - [X] Posix, by iteratng possible device files
-- [X] High level `SerialPortStream` that complies with the `streams` API
-- [X] Async API using `asyncdispatch` for reading from and writing to a port
+- Basic port reading/writing for Windows/Posix
+- Port setting control - baud rate, stop bits, databits, parity, handshaking
+- Port listing to list available serial ports
+    - Windows, using `SetupDiGetClassDevs`
+    - Mac, using I/O Kit
+    - Posix, by iterating possible device files
+- High level `SerialPortStream` that complies with the `streams` API
+- Async API using `asyncdispatch` for reading from and writing to a port
