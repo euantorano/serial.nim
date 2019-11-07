@@ -660,7 +660,7 @@ proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
     FD_ZERO(selectSet)
     FD_SET(port.handle, selectSet)
 
-    timer.tv_usec = clong(port.readTimeout * 1000)
+    timer.tv_usec = Suseconds(port.readTimeout * 1000)
     
     if port.readTimeout < 0:
       ptrTimer = nil
@@ -726,7 +726,7 @@ proc write*(port: SerialPort, buff: pointer, len: int32): int32 =
     FD_ZERO(selectSet)
     FD_SET(port.handle, selectSet)
 
-    timer.tv_usec = clong(port.writeTimeout * 1000)
+    timer.tv_usec = Suseconds(port.writeTimeout * 1000)
     
     if port.writeTimeout < 0:
       ptrTimer = nil

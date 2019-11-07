@@ -50,12 +50,12 @@
 ##    # Read a line from the serial port then write it back.
 ##    port.writeLine(port.readLine())
 
-import streams
-
 import serial/serialport, serial/serialstream, serial/utils
 export serialport, serialstream, utils
 
 when isMainModule:
+  import streams
+
   echo "Available Serial Ports"
   echo "----------------------"
   for port in listSerialPorts():

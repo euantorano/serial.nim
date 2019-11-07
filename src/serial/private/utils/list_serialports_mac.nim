@@ -2,8 +2,6 @@
 
 {.passl: "-framework IOKit -framework CoreFoundation".}
 
-import os
-
 type
   kern_return_t = int32
   mach_port_t = uint32
