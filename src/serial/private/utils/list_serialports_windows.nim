@@ -62,7 +62,8 @@ iterator listSerialPorts*(): string =
         # Open the registry key for the device
         let regKey: HKEY = SetupDiOpenDevRegKey(devInfoSet, addr devInfo, DICS_FLAG_GLOBAL, 0, DIREG_DEV, KEY_QUERY_VALUE)
 
-        if regKey != HKEY(-1):
+        #mp035 changed the line below from HKEY(-1) because HKEY is unsigned.
+        if regKey != HKEY(high(uint32)):
           # Then read the port name from the registry
           yield getUnicodeValue("", "PortName", regKey)
 
