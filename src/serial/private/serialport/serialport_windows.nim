@@ -134,6 +134,10 @@ proc getTimeouts*(port: SerialPort | AsyncSerialPort): tuple[readTimeout: int32,
 
 proc setTimeouts*(port: SerialPort | AsyncSerialPort, readTimeout: int32, writeTimeout: int32) =
   ## Set the read and write timeouts for the serial port. Timeouts are in milliseconds.
+  ##
+  ## Setting readTimeout or writeTimeout to TIMEOUT_INFINITE will result in an infinite timeout.
+  ## Setting readTimeout to 0 will mean that reads should return immediately, even if no bytes have been received.
+  ## Setting writeTimeout to 0 will actually result in a write timeout of 1ms as 0ms write timeouts are not supported by windows.
   if not port.isOpen():
     raise newException(InvalidSerialPortStateError, "Cannot set timeouts whilst the serial port is closed")
 
@@ -158,8 +162,8 @@ proc setTimeouts*(port: SerialPort | AsyncSerialPort, readTimeout: int32, writeT
     port.commTimeouts.ReadTotalTimeoutMultiplier = 0
     port.commTimeouts.ReadIntervalTimeout = 0
 
-  # Setting WriteTotalTimeoutConstant to zero results in an infinite timeout in windows. 
-  # There is no way to actually set a zero timeout, so the next line applies a 1ms 
+  # Setting WriteTotalTimeoutConstant to zero results in an infinite timeout in windows.
+  # There is no way to actually set a zero timeout, so the next line applies a 1ms
   # timeout if the user requests zero.  Values other than zero will behave exactly as specified.
   port.commTimeouts.WriteTotalTimeoutConstant = if writeTimeout == TIMEOUT_INFINITE: 0 elif writeTimeout == 0: 1 else: writeTimeout
   port.commTimeouts.WriteTotalTimeoutMultiplier = 0

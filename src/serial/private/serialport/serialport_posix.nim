@@ -204,7 +204,7 @@ proc dataBits*(port: SerialPort | AsyncSerialPort): byte =
     result = 5
 
 # these constants should be in termios.h
-# but some higher values are not present on 
+# but some higher values are not present on
 # certain implementations.
 when defined(macosx):
   const B460800 = 460800
@@ -220,7 +220,7 @@ when defined(macosx):
   const B3500000 = 3500000
   const B4000000 = 4000000
 
-# and the missing constants for linux 
+# and the missing constants for linux
 when not declared(B57600):
   const B57600   = 0o010001
 when not declared(B115200):
@@ -251,7 +251,7 @@ when not declared(B3500000):
   const B3500000 = 0o010016
 when not declared(B4000000):
   const B4000000 = 0o010017
-     
+
 
 proc setSpeed(settings: ptr Termios, speed: int32) =
   var baud: Speed
@@ -661,7 +661,7 @@ proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
     FD_SET(port.handle, selectSet)
 
     timer.tv_usec = Suseconds(port.readTimeout * 1000)
-    
+
     if port.readTimeout < 0:
       ptrTimer = nil
     else:
@@ -727,7 +727,7 @@ proc write*(port: SerialPort, buff: pointer, len: int32): int32 =
     FD_SET(port.handle, selectSet)
 
     timer.tv_usec = Suseconds(port.writeTimeout * 1000)
-    
+
     if port.writeTimeout < 0:
       ptrTimer = nil
     else:
