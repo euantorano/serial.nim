@@ -158,8 +158,11 @@ proc setTimeouts*(port: SerialPort | AsyncSerialPort, readTimeout: int32, writeT
     port.commTimeouts.ReadTotalTimeoutMultiplier = 0
     port.commTimeouts.ReadIntervalTimeout = 0
 
-  port.commTimeouts.WriteTotalTimeoutMultiplier = 0
+  # Setting WriteTotalTimeoutConstant to zero results in an infinite timeout in windows. 
+  # There is no way to actually set a zero timeout, so the next line applies a 1ms 
+  # timeout if the user requests zero.  Values other than zero will behave exactly as specified.
   port.commTimeouts.WriteTotalTimeoutConstant = if writeTimeout == TIMEOUT_INFINITE: 0 elif writeTimeout == 0: 1 else: writeTimeout
+  port.commTimeouts.WriteTotalTimeoutMultiplier = 0
 
   if SetCommTimeouts(Handle(port.handle), addr port.commTimeouts) == 0:
     port.commTimeouts.ReadTotalTimeoutConstant = oldReadTotalTimeoutConstant
