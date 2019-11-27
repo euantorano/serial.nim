@@ -37,6 +37,8 @@ type
 
   InvalidDataBitsError* = object of Exception
 
+  InvalidStopBitsError* = object of Exception
+
   ReceivedError* {.pure.} = enum
     ## Types of error detected by the operating system whilst reading from/writing to a serial port.
     Framing = "The hardware detected a framing error.",
