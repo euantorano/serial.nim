@@ -143,19 +143,20 @@ proc setTimeouts*(port: SerialPort | AsyncSerialPort, readTimeout: int32, writeT
   let oldWriteTotalTimeoutMultiplier = port.commTimeouts.WriteTotalTimeoutMultiplier
   let oldWriteTotalTimeoutConstant = port.commTimeouts.WriteTotalTimeoutConstant
 
+  #see https://docs.microsoft.com/en-gb/windows/win32/api/winbase/ns-winbase-commtimeouts
   case readTimeout
   of 0:
     port.commTimeouts.ReadTotalTimeoutConstant = 0
     port.commTimeouts.ReadTotalTimeoutMultiplier = 0
     port.commTimeouts.ReadIntervalTimeout = MAXDWORD
   of TIMEOUT_INFINITE:
-    port.commTimeouts.ReadTotalTimeoutConstant = -2
-    port.commTimeouts.ReadTotalTimeoutMultiplier = MAXDWORD
-    port.commTimeouts.ReadIntervalTimeout = MAXDWORD
+    port.commTimeouts.ReadTotalTimeoutConstant = 0
+    port.commTimeouts.ReadTotalTimeoutMultiplier = 0
+    port.commTimeouts.ReadIntervalTimeout = 0
   else:
     port.commTimeouts.ReadTotalTimeoutConstant = readTimeout
-    port.commTimeouts.ReadTotalTimeoutMultiplier = MAXDWORD
-    port.commTimeouts.ReadIntervalTimeout = MAXDWORD
+    port.commTimeouts.ReadTotalTimeoutMultiplier = 0
+    port.commTimeouts.ReadIntervalTimeout = 0
 
   port.commTimeouts.WriteTotalTimeoutMultiplier = 0
   port.commTimeouts.WriteTotalTimeoutConstant = if writeTimeout == -1: 0 else: writeTimeout
