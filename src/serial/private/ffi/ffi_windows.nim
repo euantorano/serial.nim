@@ -26,9 +26,7 @@ const
   DTR_CONTROL_HANDSHAKE* = DWORD(0x02)
     ## Enables DTR handshaking. If handshaking is enabled, it is an error for the application to adjust the line by using the EscapeCommFunction function.
 
-  #mp035: winlean defines DWORD as int32
-  #MAXDWORD*: DWORD = DWORD(high(uint32))
-  MAXDWORD*: DWORD = DWORD(high(int32))
+  MAXDWORD*: DWORD = cast[DWORD](high(uint32))
 
   EV_BREAK*: DWORD = DWORD(0x0040)
     ## A break was detected on input.

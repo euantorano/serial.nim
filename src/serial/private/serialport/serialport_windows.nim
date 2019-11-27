@@ -72,9 +72,6 @@ proc initDcb(port: SerialPort | AsyncSerialPort, baudRate: int32, parity: Parity
     port.dcb.StopBits = TWOSTOPBITS
   of StopBits.OnePointFive:
     port.dcb.StopBits = ONE5STOPBITS
-  #mp035: remove invalid else case
-  #else:
-  #  raise newException(InvalidStopBitsError, "Invalid number of stop bits '" & $stopBits & "'")
 
   port.dcb.Parity = byte(parity)
 
@@ -146,22 +143,26 @@ proc setTimeouts*(port: SerialPort | AsyncSerialPort, readTimeout: int32, writeT
   let oldWriteTotalTimeoutMultiplier = port.commTimeouts.WriteTotalTimeoutMultiplier
   let oldWriteTotalTimeoutConstant = port.commTimeouts.WriteTotalTimeoutConstant
 
+  #see https://docs.microsoft.com/en-gb/windows/win32/api/winbase/ns-winbase-commtimeouts
   case readTimeout
   of 0:
     port.commTimeouts.ReadTotalTimeoutConstant = 0
     port.commTimeouts.ReadTotalTimeoutMultiplier = 0
     port.commTimeouts.ReadIntervalTimeout = MAXDWORD
   of TIMEOUT_INFINITE:
-    port.commTimeouts.ReadTotalTimeoutConstant = -2
-    port.commTimeouts.ReadTotalTimeoutMultiplier = MAXDWORD
-    port.commTimeouts.ReadIntervalTimeout = MAXDWORD
+    port.commTimeouts.ReadTotalTimeoutConstant = 0
+    port.commTimeouts.ReadTotalTimeoutMultiplier = 0
+    port.commTimeouts.ReadIntervalTimeout = 0
   else:
     port.commTimeouts.ReadTotalTimeoutConstant = readTimeout
-    port.commTimeouts.ReadTotalTimeoutMultiplier = MAXDWORD
-    port.commTimeouts.ReadIntervalTimeout = MAXDWORD
+    port.commTimeouts.ReadTotalTimeoutMultiplier = 0
+    port.commTimeouts.ReadIntervalTimeout = 0
 
+  # Setting WriteTotalTimeoutConstant to zero results in an infinite timeout in windows. 
+  # There is no way to actually set a zero timeout, so the next line applies a 1ms 
+  # timeout if the user requests zero.  Values other than zero will behave exactly as specified.
+  port.commTimeouts.WriteTotalTimeoutConstant = if writeTimeout == TIMEOUT_INFINITE: 0 elif writeTimeout == 0: 1 else: writeTimeout
   port.commTimeouts.WriteTotalTimeoutMultiplier = 0
-  port.commTimeouts.WriteTotalTimeoutConstant = if writeTimeout == -1: 0 else: writeTimeout
 
   if SetCommTimeouts(Handle(port.handle), addr port.commTimeouts) == 0:
     port.commTimeouts.ReadTotalTimeoutConstant = oldReadTotalTimeoutConstant
@@ -229,9 +230,6 @@ proc `stopBits=`*(port: SerialPort | AsyncSerialPort, stopBits: StopBits) =
     stopBitsNative = TWOSTOPBITS
   of StopBits.OnePointFive:
     stopBitsNative = ONE5STOPBITS
-  #mp035: remove invalid else case
-  #else:
-  #  raise newException(InvalidStopBitsError, "Invalid number of stop bits '" & $stopBits & "'")
 
   if stopBitsNative != port.dcb.StopBits:
     let oldStopBits = port.dcb.StopBits
