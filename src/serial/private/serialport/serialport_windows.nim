@@ -159,7 +159,7 @@ proc setTimeouts*(port: SerialPort | AsyncSerialPort, readTimeout: int32, writeT
     port.commTimeouts.ReadIntervalTimeout = 0
 
   port.commTimeouts.WriteTotalTimeoutMultiplier = 0
-  port.commTimeouts.WriteTotalTimeoutConstant = if writeTimeout == -1: 0 else: writeTimeout
+  port.commTimeouts.WriteTotalTimeoutConstant = if writeTimeout == TIMEOUT_INFINITE: 0 elif writeTimeout == 0: 1 else: writeTimeout
 
   if SetCommTimeouts(Handle(port.handle), addr port.commTimeouts) == 0:
     port.commTimeouts.ReadTotalTimeoutConstant = oldReadTotalTimeoutConstant
