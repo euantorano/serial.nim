@@ -684,7 +684,13 @@ proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
   else:
     let numRead = posix.read(port.handle, buff, int(len))
     if numRead == -1:
-      raiseOSError(osLastError())
+      # port FD is set to O_NONBLOCK so EWOULDBLOCK error is set when 
+      # no data is available, which is treated as a timeout condition.
+      # This means that posix behaves the same as windows. 
+      if cint(osLastError()) == EWOULDBLOCK:
+        raise newException(TimeoutError, "Read timed out after 0 seconds")
+      else:
+        raiseOSError(osLastError())
 
     result = int32(numRead)
 
