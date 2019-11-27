@@ -1,5 +1,5 @@
 when defined(nimdoc):
-  iterator listSerialPorts*(): string {.raises:[OSError].} = discard
+  iterator listSerialPorts*(): string {.raises: [OSError].} = discard
     ## Iterate through a list of the available serial port names on the system.
 elif defined(windows):
   include ./private/utils/list_serialports_windows

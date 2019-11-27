@@ -22,16 +22,21 @@ const
   NULL_HANDLE: uint = 0
 
 var
-  GUID_DEVINTERFACE_COMPORT : GUID = GUID(D1: 0x86e0d1e0'i32, D2: 0x8089'i16, D3: 0x11d0, D4: [
+  GUID_DEVINTERFACE_COMPORT: GUID = GUID(D1: 0x86e0d1e0'i32, D2: 0x8089'i16,
+    D3: 0x11d0, D4: [
     0x9c'i8, 0xe4'i8, 0x08'i8, 0x00'i8, 0x3e'i8, 0x30'i8, 0x1f'i8, 0x73'i8])
 
-proc SetupDiGetClassDevs(ClassGuid: ptr GUID, Enumerator: cstring, hwndParent: uint, Flags: DWORD): HDEVINFO
+proc SetupDiGetClassDevs(ClassGuid: ptr GUID, Enumerator: cstring,
+    hwndParent: uint, Flags: DWORD): HDEVINFO
   {.stdcall, importc: "SetupDiGetClassDevsW", dynlib: "setupapi.dll".}
 
-proc SetupDiEnumDeviceInfo(DeviceInfoSet: HDEVINFO, MemberIndex: DWORD, DeviceInfoData: ptr SP_DEVINFO_DATA): bool
+proc SetupDiEnumDeviceInfo(DeviceInfoSet: HDEVINFO, MemberIndex: DWORD,
+    DeviceInfoData: ptr SP_DEVINFO_DATA): bool
   {.stdcall, importc: "SetupDiEnumDeviceInfo", dynlib: "setupapi.dll".}
 
-proc SetupDiOpenDevRegKey(DeviceInfoSet: HDEVINFO, DeviceInfoData: ptr SP_DEVINFO_DATA, Scope: DWORD, HwProfile: DWORD, KeyType: DWORD, samDesired: REGSAM): HKEY
+proc SetupDiOpenDevRegKey(DeviceInfoSet: HDEVINFO,
+    DeviceInfoData: ptr SP_DEVINFO_DATA, Scope: DWORD, HwProfile: DWORD,
+    KeyType: DWORD, samDesired: REGSAM): HKEY
   {.stdcall, importc: "SetupDiOpenDevRegKey", dynlib: "setupapi.dll".}
 
 proc SetupDiDestroyDeviceInfoList(DeviceInfoSet: HDEVINFO): bool
@@ -43,7 +48,8 @@ iterator listSerialPorts*(): string =
   ## This is based upon the `CEnumerateSerial::QueryUsingSetupAPI` method from `CEnumerateSerial`: http://www.naughter.com/enumser.html
 
   # First create a "device info set" for the device interface GUID
-  let devInfoSet = SetupDiGetClassDevs(addr GUID_DEVINTERFACE_COMPORT, nil, NULL_HANDLE, setupDiGetClassDevsInitialFlags)
+  let devInfoSet = SetupDiGetClassDevs(addr GUID_DEVINTERFACE_COMPORT, nil,
+      NULL_HANDLE, setupDiGetClassDevsInitialFlags)
   if devInfoSet[] == -1:
     raiseOsError(osLastError())
 
@@ -60,7 +66,8 @@ iterator listSerialPorts*(): string =
 
       if moreItems:
         # Open the registry key for the device
-        let regKey: HKEY = SetupDiOpenDevRegKey(devInfoSet, addr devInfo, DICS_FLAG_GLOBAL, 0, DIREG_DEV, KEY_QUERY_VALUE)
+        let regKey: HKEY = SetupDiOpenDevRegKey(devInfoSet, addr devInfo,
+            DICS_FLAG_GLOBAL, 0, DIREG_DEV, KEY_QUERY_VALUE)
 
         if regKey != cast[HKEY](-1):
           # Then read the port name from the registry

@@ -2,7 +2,8 @@
 
 import os
 
-const deviceGrepPaths = ["/dev/ttyS*", "/dev/ttyUSB*", "/dev/ttyACM*", "/dev/ttyAMA*", "/dev/rfcomm*"]
+const deviceGrepPaths = ["/dev/ttyS*", "/dev/ttyUSB*", "/dev/ttyACM*",
+    "/dev/ttyAMA*", "/dev/rfcomm*"]
 
 proc checkPath(path: string): bool =
   let fileName = extractFilename(path)

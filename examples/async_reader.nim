@@ -9,10 +9,13 @@ when isMainModule:
     let futVar = newFutureVar[string]()
     futVar.mget() = newString(10)
 
-    try:
-      discard await port.read(futVar)
+    var numRead = 0'i32
 
-      echo "Received from the serial port: ", futVar.read()
+    try:
+      numRead = await port.read(futVar)
+
+      echo "Received ", numRead, " bytes from the serial port: ",
+          futVar.read()
     except:
       echo "Error reading from serial port: ", getCurrentExceptionMsg()
       result = false
