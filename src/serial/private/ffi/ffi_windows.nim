@@ -98,26 +98,27 @@ const
 type
   FileType* {.pure.} = enum
     Unknown = DWORD(0x0000), ## Either the type of the specified file is unknown, or the function failed.
-    Disk = DWORD(0x0001), ## The specified file is a disk file.
+    Disk = DWORD(0x0001),   ## The specified file is a disk file.
     Character = DWORD(0x0002), ## The specified file is a character file, typically an LPT device or a console.
-    Pipe = DWORD(0x0003), ## The specified file is a socket, a named pipe, or an anonymous pipe.
+    Pipe = DWORD(0x0003),  ## The specified file is a socket, a named pipe, or an anonymous pipe.
     Remote = DWORD(0x8000), ## Unused
 
   WORD* = uint16
 
-  CommProp* {.importc: "COMMPROP", header: "Windows.h", incompleteStruct.} = object
+  CommProp* {.importc: "COMMPROP", header: "<windows.h>",
+      incompleteStruct.} = object
     wPacketLength*: WORD ## The size of the entire data packet, regardless of the amount of data requested, in bytes.
     wPacketVersion*: WORD ## The version of the structure.
     dwServiceMask*: DWORD ## A bitmask indicating which services are implemented by this provider. The SP_SERIALCOMM value is always specified for communications providers, including modem providers.
-    dwReserved1*: DWORD # Reserved; do not use.
+    dwReserved1*: DWORD   # Reserved; do not use.
     dwMaxTxQueue*: DWORD ## The maximum size of the driver's internal output buffer, in bytes. A value of zero indicates that no maximum value is imposed by the serial provider.
     dwMaxRxQueue*: DWORD ## The maximum size of the driver's internal input buffer, in bytes. A value of zero indicates that no maximum value is imposed by the serial provider.
-    dwMaxBaud*: DWORD ## The maximum allowable baud rate, in bits per second (bps).
+    dwMaxBaud*: DWORD     ## The maximum allowable baud rate, in bits per second (bps).
     dwProvSubType*: DWORD ## The communications-provider type.
     dwProvCapabilities*: DWORD ## A bitmask indicating the capabilities offered by the provider.
     dwSettableParams*: DWORD ## A bitmask indicating the communications parameters that can be changed.
     dwSettableBaud*: DWORD ## The baud rates that can be used. For values, see the dwMaxBaud member.
-    wSettableData*: WORD ## A bitmask indicating the number of data bits that can be set.
+    wSettableData*: WORD  ## A bitmask indicating the number of data bits that can be set.
     wSettableStopParity*: WORD ## A bitmask indicating the stop bit and parity settings that can be selected.
     dwCurrentTxQueue*: DWORD ## The size of the driver's internal output buffer, in bytes. A value of zero indicates that the value is unavailable.
     dwCurrentRxQueue*: DWORD ## The size of the driver's internal input buffer, in bytes. A value of zero indicates that the value is unavailable.
@@ -127,15 +128,16 @@ type
 
   LPCOMMPROP* = ptr CommProp
 
-  ComStat* {.importc: "COMSTAT", header: "Windows.h", incompleteStruct.} = object
-    fCtsHold* {.bitsize:1.}: DWORD ## If this member is TRUE, transmission is waiting for the CTS (clear-to-send) signal to be sent.
-    fDsrHold* {.bitsize:1.}: DWORD ## If this member is TRUE, transmission is waiting for the DSR (data-set-ready) signal to be sent.
-    fRlsdHold* {.bitsize:1.}: DWORD ## If this member is TRUE, transmission is waiting for the RLSD (receive-line-signal-detect) signal to be sent.
-    fXoffHold* {.bitsize:1.}: DWORD ## If this member is TRUE, transmission is waiting because the XOFF character was received.
-    fXoffSent* {.bitsize:1.}: DWORD ## If this member is TRUE, transmission is waiting because the XOFF character was transmitted. (Transmission halts when the XOFF character is transmitted to a system that takes the next character as XON, regardless of the actual character.)
-    fEof* {.bitsize:1.}: DWORD ## If this member is TRUE, the end-of-file (EOF) character has been received.
-    fTxim* {.bitsize:1.}: DWORD ## If this member is TRUE, there is a character queued for transmission that has come to the communications device by way of the TransmitCommChar function. The communications device transmits such a character ahead of other characters in the device's output buffer.
-    fReserved* {.bitsize:25.}: DWORD ## Reserved; do not use.
+  ComStat* {.importc: "COMSTAT", header: "<windows.h>",
+      incompleteStruct.} = object
+    fCtsHold* {.bitsize: 1.}: DWORD ## If this member is TRUE, transmission is waiting for the CTS (clear-to-send) signal to be sent.
+    fDsrHold* {.bitsize: 1.}: DWORD ## If this member is TRUE, transmission is waiting for the DSR (data-set-ready) signal to be sent.
+    fRlsdHold* {.bitsize: 1.}: DWORD ## If this member is TRUE, transmission is waiting for the RLSD (receive-line-signal-detect) signal to be sent.
+    fXoffHold* {.bitsize: 1.}: DWORD ## If this member is TRUE, transmission is waiting because the XOFF character was received.
+    fXoffSent* {.bitsize: 1.}: DWORD ## If this member is TRUE, transmission is waiting because the XOFF character was transmitted. (Transmission halts when the XOFF character is transmitted to a system that takes the next character as XON, regardless of the actual character.)
+    fEof* {.bitsize: 1.}: DWORD ## If this member is TRUE, the end-of-file (EOF) character has been received.
+    fTxim* {.bitsize: 1.}: DWORD ## If this member is TRUE, there is a character queued for transmission that has come to the communications device by way of the TransmitCommChar function. The communications device transmits such a character ahead of other characters in the device's output buffer.
+    fReserved* {.bitsize: 25.}: DWORD ## Reserved; do not use.
     cbInQue*: DWORD ## The number of bytes received by the serial provider but not yet read by a ReadFile operation.
     cbOutQue*: DWORD ## The number of bytes of user data remaining to be transmitted for all write operations. This value will be zero for a nonoverlapped write.
 
@@ -155,56 +157,72 @@ type
     fNull* {.bitsize: 1.}: DWORD ## If this member is TRUE, null bytes are discarded when received.
     fRtsControl* {.bitsize: 2.}: DWORD ## The RTS (request-to-send) flow control.
     fAbortOnError* {.bitsize: 1.}: DWORD ## If this member is TRUE, the driver terminates all read and write operations with an error status if an error occurs. The driver will not accept any further communications operations until the application has acknowledged the error by calling the ClearCommError function.
-    fDummy2* {.bitsize: 17.}: DWORD ## Reserved; do not use.
-    wReserved*: WORD ## Reserved; must be zero.
+    fDummy2* {.bitsize: 17.}: DWORD    ## Reserved; do not use.
+    wReserved*: WORD                   ## Reserved; must be zero.
     XonLim*: WORD ## The minimum number of bytes in use allowed in the input buffer before flow control is activated to allow transmission by the sender. This assumes that either XON/XOFF, RTS, or DTR input flow control is specified in the fInX, fRtsControl, or fDtrControl members.
     XoffLim*: WORD ## The minimum number of free bytes allowed in the input buffer before flow control is activated to inhibit the sender. Note that the sender may transmit characters after the flow control signal has been activated, so this value should never be zero. This assumes that either XON/XOFF, RTS, or DTR input flow control is specified in the fInX, fRtsControl, or fDtrControl members. The maximum number of bytes in use allowed is calculated by subtracting this value from the size, in bytes, of the input buffer.
     ByteSize*: byte ## The number of bits in the bytes transmitted and received.
-    Parity*: byte ## The parity scheme to be used.
-    StopBits*: byte ## The number of stop bits to be used.
+    Parity*: byte                      ## The parity scheme to be used.
+    StopBits*: byte                    ## The number of stop bits to be used.
     XonChar*: cchar ## The value of the XON character for both transmission and reception.
     XoffChar*: cchar ## The value of the XOFF character for both transmission and reception.
     ErrorChar*: cchar ## The value of the character used to replace bytes received with a parity error.
     EofChar*: cchar ## The value of the character used to signal the end of data.
-    EvtChar*: cchar ## The value of the character used to signal an event.
-    wReserved1*: WORD ## Reserved; do not use.
+    EvtChar*: cchar                    ## The value of the character used to signal an event.
+    wReserved1*: WORD                  ## Reserved; do not use.
 
   LPDCB = ptr DCB
 
-  COMMTIMEOUTS* {.importc: "COMMTIMEOUTS", header: "<windows.h>", incompleteStruct.} = object
+  COMMTIMEOUTS* {.importc: "COMMTIMEOUTS", header: "<windows.h>",
+      incompleteStruct.} = object
     ReadIntervalTimeout*: DWORD
     ReadTotalTimeoutMultiplier*: DWORD
     ReadTotalTimeoutConstant*: DWORD
     WriteTotalTimeoutMultiplier*: DWORD
     WriteTotalTimeoutConstant*: DWORD
 
-proc GetFileType*(hFile: Handle): DWORD {.stdcall, dynlib: "kernel32", importc: "GetFileType".}
+proc GetFileType*(hFile: Handle): DWORD {.stdcall, dynlib: "kernel32",
+    importc: "GetFileType".}
 
-proc GetCommProperties*(hFile: Handle, lpCommProp: LPCOMMPROP): WINBOOL {.stdcall, dynlib: "kernel32", importc: "GetCommProperties".}
+proc GetCommProperties*(hFile: Handle, lpCommProp: LPCOMMPROP): WINBOOL {.
+    stdcall, dynlib: "kernel32", importc: "GetCommProperties".}
 
-proc GetCommModemStatus*(hFile: Handle, lpModemStat: PDWORD): WINBOOL {.stdcall, dynlib: "kernel32", importc: "GetCommModemStatus".}
+proc GetCommModemStatus*(hFile: Handle, lpModemStat: PDWORD): WINBOOL {.stdcall,
+    dynlib: "kernel32", importc: "GetCommModemStatus".}
 
-proc GetCommState*(hFile: Handle, lpDCB: LPDCB): WINBOOL {.stdcall, dynlib: "kernel32", importc: "GetCommState".}
+proc GetCommState*(hFile: Handle, lpDCB: LPDCB): WINBOOL {.stdcall,
+    dynlib: "kernel32", importc: "GetCommState".}
 
-proc SetCommState*(hFile: Handle, lpDCB: LPDCB): WINBOOL {.stdcall, dynlib: "kernel32", importc: "SetCommState".}
+proc SetCommState*(hFile: Handle, lpDCB: LPDCB): WINBOOL {.stdcall,
+    dynlib: "kernel32", importc: "SetCommState".}
 
-proc GetCommTimeouts*(hFile: Handle, lpCommTimeouts: ptr COMMTIMEOUTS): WINBOOL {.stdcall, dynlib: "kernel32", importc: "GetCommTimeouts".}
+proc GetCommTimeouts*(hFile: Handle, lpCommTimeouts: ptr COMMTIMEOUTS): WINBOOL {.
+    stdcall, dynlib: "kernel32", importc: "GetCommTimeouts".}
 
-proc SetCommTimeouts*(hFile: Handle, lpCommTimeouts: ptr COMMTIMEOUTS): WINBOOL {.stdcall, dynlib: "kernel32", importc: "SetCommTimeouts".}
+proc SetCommTimeouts*(hFile: Handle, lpCommTimeouts: ptr COMMTIMEOUTS): WINBOOL {.
+    stdcall, dynlib: "kernel32", importc: "SetCommTimeouts".}
 
-proc SetCommMask*(hFile: Handle, dwEvtMask: DWORD): WINBOOL {.stdcall, dynlib: "kernel32", importc: "SetCommMask".}
+proc SetCommMask*(hFile: Handle, dwEvtMask: DWORD): WINBOOL {.stdcall,
+    dynlib: "kernel32", importc: "SetCommMask".}
 
-proc EscapeCommFunction*(hFile: Handle, dwFunc: DWORD): WINBOOL {.stdcall, dynlib: "kernel32", importc: "EscapeCommFunction".}
+proc EscapeCommFunction*(hFile: Handle, dwFunc: DWORD): WINBOOL {.stdcall,
+    dynlib: "kernel32", importc: "EscapeCommFunction".}
 
-proc FlushFileBuffers*(hFile: Handle): WINBOOL {.stdcall, dynlib: "kernel32", importc: "FlushFileBuffers".}
+proc FlushFileBuffers*(hFile: Handle): WINBOOL {.stdcall, dynlib: "kernel32",
+    importc: "FlushFileBuffers".}
 
-proc PurgeComm*(hFile: Handle, dwFlags: DWORD): WINBOOL {.stdcall, dynlib: "kernel32", importc: "PurgeComm".}
+proc PurgeComm*(hFile: Handle, dwFlags: DWORD): WINBOOL {.stdcall,
+    dynlib: "kernel32", importc: "PurgeComm".}
 
-proc SetCommBreak*(hFile: Handle): WINBOOL {.stdcall, dynlib: "kernel32", importc: "SetCommBreak".}
+proc SetCommBreak*(hFile: Handle): WINBOOL {.stdcall, dynlib: "kernel32",
+    importc: "SetCommBreak".}
 
-proc ClearCommBreak*(hFile: Handle): WINBOOL {.stdcall, dynlib: "kernel32", importc: "ClearCommBreak".}
+proc ClearCommBreak*(hFile: Handle): WINBOOL {.stdcall, dynlib: "kernel32",
+    importc: "ClearCommBreak".}
 
-proc ClearCommError*(hFile: Handle, lpErrors: ptr DWORD, lpStat: ptr ComStat): WINBOOL {.stdcall, dynlib: "kernel32", importc: "ClearCommError".}
+proc ClearCommError*(hFile: Handle, lpErrors: ptr DWORD,
+    lpStat: ptr ComStat): WINBOOL {.stdcall, dynlib: "kernel32",
+    importc: "ClearCommError".}
 
 when useWinUnicode:
   const CreateFileWindows* = createFileW

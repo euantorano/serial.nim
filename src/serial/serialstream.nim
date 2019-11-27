@@ -17,8 +17,8 @@ type
     case isBuffered: bool # determines whether this stream is buffered
     of true:
       buffer: array[0..BufferSize, char]
-      currPos: int # current index in buffer
-      bufLen: int # current length of buffer
+      currPos: int        # current index in buffer
+      bufLen: int         # current length of buffer
     of false: nil
 
 proc spClose(s: Stream) =
@@ -121,19 +121,24 @@ proc newSerialStream*(p: SerialPort, buffered = false): SerialStream =
   )
 
 proc newSerialStream*(portName: string, baudRate: int32, parity: Parity, dataBits: byte, stopBits: StopBits,
-                      handshaking: Handshake = Handshake.None, readTimeout = TIMEOUT_INFINITE,
-                      writeTimeout = TIMEOUT_INFINITE, dtrEnable = false, rtsEnable = false, buffered = false): SerialStream =
+                      handshaking: Handshake = Handshake.None,
+                          readTimeout = TIMEOUT_INFINITE,
+                      writeTimeout = TIMEOUT_INFINITE, dtrEnable = false,
+                          rtsEnable = false, buffered = false): SerialStream =
   ## Create a new serial stream for the given serial port with name `portName` and the given settings.
   let port = newSerialPort(portName)
-  port.open(baudRate, parity, dataBits, stopBits, handshaking, readTimeout, writeTimeout, dtrEnable, rtsEnable)
+  port.open(baudRate, parity, dataBits, stopBits, handshaking, readTimeout,
+      writeTimeout, dtrEnable, rtsEnable)
 
   result = newSerialStream(port, buffered)
 
-proc getTimeouts*(stream: SerialStream): tuple[readTimeout: int32, writeTimeout: int32] =
+proc getTimeouts*(stream: SerialStream): tuple[readTimeout: int32,
+    writeTimeout: int32] =
   ## Get the read and write timeouts for the serial port.
   result = stream.port.getTimeouts()
 
-proc setTimeouts*(stream: SerialStream, readTimeout: int32, writeTimeout: int32) =
+proc setTimeouts*(stream: SerialStream, readTimeout: int32,
+    writeTimeout: int32) =
   ## Set the read and write timeouts for the serial port.
   stream.port.setTimeouts(readTImeout, writeTimeout)
 

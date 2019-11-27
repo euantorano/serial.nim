@@ -56,7 +56,9 @@ proc isOpen*(port: SerialPort | AsyncSerialPort): bool =
   ## Check whether the serial port is currently open.
   result = FileHandle(port.handle) != InvalidFileHandle
 
-proc initDcb(port: SerialPort | AsyncSerialPort, baudRate: int32, parity: Parity, dataBits: byte, stopBits: StopBits, handshaking: Handshake) =
+proc initDcb(port: SerialPort | AsyncSerialPort, baudRate: int32,
+    parity: Parity, dataBits: byte, stopBits: StopBits,
+    handshaking: Handshake) =
   if GetCommState(Handle(port.handle), addr port.dcb) == 0:
     raiseOSError(osLastError())
 
@@ -122,17 +124,21 @@ proc initDcb(port: SerialPort | AsyncSerialPort, baudRate: int32, parity: Parity
   if SetCommState(Handle(port.handle), addr port.dcb) == 0:
     raiseOSError(osLastError())
 
-proc getTimeouts*(port: SerialPort | AsyncSerialPort): tuple[readTimeout: int32, writeTimeout: int32] =
+proc getTimeouts*(port: SerialPort | AsyncSerialPort): tuple[readTimeout: int32,
+    writeTimeout: int32] =
   ## Get the read and write timeouts for the serial port.
   if not port.isOpen():
     raise newException(InvalidSerialPortStateError, "Cannot get timeouts whilst the serial port is closed")
 
   result = (
-    readTimeout: if port.commTimeouts.ReadTotalTimeoutConstant == -2: TIMEOUT_INFINITE else: port.commTimeouts.ReadTotalTimeoutConstant,
-    writeTimeout: if port.commTimeouts.WriteTotalTimeoutConstant == 0: TIMEOUT_INFINITE else: port.commTimeouts.WriteTotalTimeoutConstant
+    readTimeout: if port.commTimeouts.ReadTotalTimeoutConstant ==
+    -2: TIMEOUT_INFINITE else: port.commTimeouts.ReadTotalTimeoutConstant,
+    writeTimeout: if port.commTimeouts.WriteTotalTimeoutConstant ==
+    0: TIMEOUT_INFINITE else: port.commTimeouts.WriteTotalTimeoutConstant
   )
 
-proc setTimeouts*(port: SerialPort | AsyncSerialPort, readTimeout: int32, writeTimeout: int32) =
+proc setTimeouts*(port: SerialPort | AsyncSerialPort, readTimeout: int32,
+    writeTimeout: int32) =
   ## Set the read and write timeouts for the serial port. Timeouts are in milliseconds.
   ##
   ## Setting readTimeout or writeTimeout to TIMEOUT_INFINITE will result in an infinite timeout.
@@ -165,7 +171,8 @@ proc setTimeouts*(port: SerialPort | AsyncSerialPort, readTimeout: int32, writeT
   # Setting WriteTotalTimeoutConstant to zero results in an infinite timeout in windows.
   # There is no way to actually set a zero timeout, so the next line applies a 1ms
   # timeout if the user requests zero.  Values other than zero will behave exactly as specified.
-  port.commTimeouts.WriteTotalTimeoutConstant = if writeTimeout == TIMEOUT_INFINITE: 0 elif writeTimeout == 0: 1 else: writeTimeout
+  port.commTimeouts.WriteTotalTimeoutConstant = if writeTimeout ==
+      TIMEOUT_INFINITE: 0 elif writeTimeout == 0: 1 else: writeTimeout
   port.commTimeouts.WriteTotalTimeoutMultiplier = 0
 
   if SetCommTimeouts(Handle(port.handle), addr port.commTimeouts) == 0:
@@ -188,7 +195,7 @@ proc isCarrierHolding*(port: SerialPort | AsyncSerialPort): bool =
 
   result = (pinStatus and MS_RLSD_ON) != 0
 
-proc isCtsHolding*(port: SerialPort| AsyncSerialPort): bool =
+proc isCtsHolding*(port: SerialPort | AsyncSerialPort): bool =
   ## Check whether the clear to send signal is currently active.
   if not port.isOpen():
     raise newException(InvalidSerialPortStateError, "Cannot check the clear to send signal whilst the serial port is closed")
@@ -256,7 +263,8 @@ proc stopBits*(port: SerialPort | AsyncSerialPort): StopBits =
   of ONE5STOPBITS:
     result = StopBits.OnePointFive
   else:
-    raise newException(InvalidStopBitsError, "Unknown number of stop bits: " & $port.dcb.StopBits)
+    raise newException(InvalidStopBitsError, "Unknown number of stop bits: " &
+        $port.dcb.StopBits)
 
 proc `dataBits=`*(port: SerialPort | AsyncSerialPort, dataBits: byte) =
   ## Set the number of data bits for the serial port.
@@ -283,11 +291,14 @@ proc `baudRate=`*(port: SerialPort | AsyncSerialPort, baudRate: int32) =
   if not port.isOpen():
     raise newException(InvalidSerialPortStateError, "Cannot set the baud rate whilst the serial port is closed")
 
-  if baudRate <= 0 or (baudRate > port.commProp.dwMaxBaud and port.commProp.dwMaxBaud > 0):
+  if baudRate <= 0 or (baudRate > port.commProp.dwMaxBaud and
+      port.commProp.dwMaxBaud > 0):
     if port.commProp.dwMaxBaud > 0:
       raise newException(InvalidBaudRateError, "Baud rate must be greater than 0")
     else:
-      raise newException(InvalidBaudRateError, "Baud rate must be greater than 0 but less than " & $port.commProp.dwMaxBaud)
+      raise newException(InvalidBaudRateError,
+          "Baud rate must be greater than 0 but less than " &
+          $port.commProp.dwMaxBaud)
 
   if baudrate != port.dcb.BaudRate:
     let oldBaudRate = port.dcb.BaudRate
@@ -376,7 +387,8 @@ proc setDtrEnable(port: SerialPort | AsyncSerialPort, dtrEnabled: bool) =
     raiseOSError(osLastError())
 
   # Now set the actual pin
-  if EscapeCommFunction(Handle(port.handle), if dtrEnabled: SETDTR else: CLRDTR) == 0:
+  if EscapeCommFunction(Handle(port.handle),
+      if dtrEnabled: SETDTR else: CLRDTR) == 0:
     raiseOSError(osLastError())
 
 proc `dtrEnable=`*(port: SerialPort | AsyncSerialPort, dtrEnabled: bool) =
@@ -394,7 +406,8 @@ proc dtrEnable*(port: SerialPort | AsyncSerialPort): bool =
   result = port.dcb.fDtrControl == DTR_CONTROL_ENABLE
 
 proc setRtsEnable(port: SerialPort | AsyncSerialPort, rtsEnabled: bool) =
-  if port.handshake in {Handshake.RequestToSend, Handshake.RequestToSendXOnXOff}:
+  if port.handshake in {Handshake.RequestToSend,
+      Handshake.RequestToSendXOnXOff}:
     raise newException(InvalidSerialPortStateError, "Cannot set or clear RTS when using RTS or RTS XON/XOFF handshaking")
 
   if rtsEnabled != port.isRtsEnabled:
@@ -412,7 +425,8 @@ proc setRtsEnable(port: SerialPort | AsyncSerialPort, rtsEnabled: bool) =
 
       raiseOSError(osLastError())
 
-    if EscapeCommFunction(Handle(port.handle), if rtsEnabled: SETRTS else: CLRRTS) == 0:
+    if EscapeCommFunction(Handle(port.handle),
+        if rtsEnabled: SETRTS else: CLRRTS) == 0:
       raiseOSError(osLastError())
 
 proc `rtsEnable=`*(port: SerialPort | AsyncSerialPort, rtsEnabled: bool) =
@@ -445,7 +459,8 @@ proc `handshake=`*(port: SerialPort | AsyncSerialPort, handshake: Handshake) =
     let oldfRtsControl = port.dcb.fRtsControl
 
     port.handshake = handshake
-    let fInX = if handshake in {Handshake.XOnXOff, Handshake.RequestToSendXOnXOff}: DWORD(1) else: DWORD(0)
+    let fInX = if handshake in {Handshake.XOnXOff,
+        Handshake.RequestToSendXOnXOff}: DWORD(1) else: DWORD(0)
 
     port.dcb.fInX = fInX
     port.dcb.fOutX = fInX
@@ -476,8 +491,10 @@ proc handshake*(port: SerialPort | AsyncSerialPort): Handshake =
   result = port.handshake
 
 proc initPort(port: SerialPort | AsyncSerialPort, tempHandle: Handle, baudRate: int32, parity: Parity, dataBits: byte, stopBits: StopBits,
-              handshaking: Handshake = Handshake.None, readTimeout = TIMEOUT_INFINITE,
-              writeTimeout = TIMEOUT_INFINITE, dtrEnable = false, rtsEnable = false) {.inline.} =
+              handshaking: Handshake = Handshake.None,
+                  readTimeout = TIMEOUT_INFINITE,
+              writeTimeout = TIMEOUT_INFINITE, dtrEnable = false,
+                  rtsEnable = false) {.inline.} =
   when port is AsyncSerialPort:
     var registered = false
 
@@ -495,7 +512,8 @@ proc initPort(port: SerialPort | AsyncSerialPort, tempHandle: Handle, baudRate: 
 
     var pinStatus: int32
 
-    if GetCommProperties(tempHandle, addr port.commProp) == 0 or GetCommModemStatus(tempHandle, addr pinStatus) == 0:
+    if GetCommProperties(tempHandle, addr port.commProp) == 0 or
+        GetCommModemStatus(tempHandle, addr pinStatus) == 0:
       let errorCode = osLastError()
       if int32(errorCode) in {ERROR_INVALID_PARAMETER, ERROR_INVALID_HANDLE}:
         raise newException(InvalidSerialPortError, "Serial port '" & port.name & "' is not a valid COM port.")
@@ -512,7 +530,8 @@ proc initPort(port: SerialPort | AsyncSerialPort, tempHandle: Handle, baudRate: 
     port.setDtrEnable(dtrEnable)
     port.isRtsEnabled = (port.dcb.fRtsControl == RTS_CONTROL_ENABLE)
 
-    if handshaking != Handshake.RequestToSend and handshaking != Handshake.RequestToSendXOnXOff:
+    if handshaking != Handshake.RequestToSend and handshaking !=
+        Handshake.RequestToSendXOnXOff:
       port.setRtsEnable(rtsEnable)
 
     if GetCommTimeouts(tempHandle, addr port.commTimeouts) == 0:
@@ -527,13 +546,16 @@ proc initPort(port: SerialPort | AsyncSerialPort, tempHandle: Handle, baudRate: 
         unregister(port.handle)
 
     discard closeHandle(tempHandle)
-    port.handle = when port is AsyncSerialPort: AsyncFD(InvalidFileHandle) else: InvalidFileHandle
+    port.handle = when port is AsyncSerialPort: AsyncFD(
+        InvalidFileHandle) else: InvalidFileHandle
 
     raise
 
 proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, stopBits: StopBits,
-           handshaking: Handshake = Handshake.None, readTimeout = TIMEOUT_INFINITE,
-           writeTimeout = TIMEOUT_INFINITE, dtrEnable = false, rtsEnable = false) =
+           handshaking: Handshake = Handshake.None,
+               readTimeout = TIMEOUT_INFINITE,
+           writeTimeout = TIMEOUT_INFINITE, dtrEnable = false,
+               rtsEnable = false) =
   ## Open the serial port for reading and writing.
   ##
   ## The `readTimeout` and `writeTimeout` are in milliseconds.
@@ -543,8 +565,8 @@ proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, st
   let tempHandle = CreateFileWindows(
     getWindowsString("\\\\.\\" & port.name),
     FileAccess,
-    FileShareMode, # Open with exclusive access
-    nil, # No security attributes
+    FileShareMode,     # Open with exclusive access
+    nil,               # No security attributes
     FileCreationDisposition,
     FileFlagsAndAttributes,
     FileTemplateHandle # hTemplate must be NULL for comm devices
@@ -553,11 +575,14 @@ proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, st
   if tempHandle == INVALID_HANDLE_VALUE:
     raiseOSError(osLastError())
 
-  initPort(port, tempHandle, baudRate, parity, dataBits, stopBits, handshaking, readTimeout, writeTimeout, dtrEnable, rtsEnable)
+  initPort(port, tempHandle, baudRate, parity, dataBits, stopBits, handshaking,
+      readTimeout, writeTimeout, dtrEnable, rtsEnable)
 
 proc open*(port: AsyncSerialPort, baudRate: int32, parity: Parity, dataBits: byte, stopBits: StopBits,
-           handshaking: Handshake = Handshake.None, readTimeout = TIMEOUT_INFINITE,
-           writeTimeout = TIMEOUT_INFINITE, dtrEnable = false, rtsEnable = false) =
+           handshaking: Handshake = Handshake.None,
+               readTimeout = TIMEOUT_INFINITE,
+           writeTimeout = TIMEOUT_INFINITE, dtrEnable = false,
+               rtsEnable = false) =
   ## Open the serial port for reading and writing.
   ##
   ## The `readTimeout` and `writeTimeout` are in milliseconds.
@@ -567,8 +592,8 @@ proc open*(port: AsyncSerialPort, baudRate: int32, parity: Parity, dataBits: byt
   let tempHandle = CreateFileWindows(
     getWindowsString("\\\\.\\" & port.name),
     FileAccess,
-    FileShareMode, # Open with exclusive access
-    nil, # No security attributes
+    FileShareMode,     # Open with exclusive access
+    nil,               # No security attributes
     FileCreationDisposition,
     AsyncFileFlagsAndAttributes,
     FileTemplateHandle # hTemplate must be NULL for comm devices
@@ -577,7 +602,8 @@ proc open*(port: AsyncSerialPort, baudRate: int32, parity: Parity, dataBits: byt
   if tempHandle == INVALID_HANDLE_VALUE:
     raiseOSError(osLastError())
 
-  initPort(port, tempHandle, baudRate, parity, dataBits, stopBits, handshaking, readTimeout, writeTimeout, dtrEnable, rtsEnable)
+  initPort(port, tempHandle, baudRate, parity, dataBits, stopBits, handshaking,
+      readTimeout, writeTimeout, dtrEnable, rtsEnable)
 
 proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
   ## Read up to `len` bytes from the serial port into the buffer `buff`. This will return the actual number of bytes that were received.
@@ -599,7 +625,8 @@ proc read*(port: AsyncSerialPort, buff: pointer, len: int32): Future[int32] =
   var retFuture = newFuture[int32]("serialport.read")
 
   if not port.isOpen():
-    retFuture.fail(newException(InvalidSerialPortStateError, "Port must be open in order to write to it"))
+    retFuture.fail(newException(InvalidSerialPortStateError,
+        "Port must be open in order to write to it"))
     return retFuture
 
   var errors: DWORD
@@ -609,7 +636,8 @@ proc read*(port: AsyncSerialPort, buff: pointer, len: int32): Future[int32] =
 
   var ol = PCustomOverlapped()
   GC_ref(ol)
-  ol.data = CompletionData(fd: port.handle, cb: proc(fd: AsyncFD, bytesCount: DWORD, errorCode: OSErrorCode) =
+  ol.data = CompletionData(fd: port.handle, cb: proc(fd: AsyncFD,
+      bytesCount: DWORD, errorCode: OSErrorCode) =
     if not retFuture.finished:
       if errorCode == OSErrorCode(-1):
         retFuture.complete(bytesCount)
@@ -622,7 +650,8 @@ proc read*(port: AsyncSerialPort, buff: pointer, len: int32): Future[int32] =
   ol.offset = DWORD(0)
   ol.offsetHigh = DWORD(0)
 
-  let ret = winlean.readFile(Handle(port.handle), buff, len, nil, cast[POVERLAPPED](ol))
+  let ret = winlean.readFile(Handle(port.handle), buff, len, nil, cast[
+      POVERLAPPED](ol))
   if not bool(ret):
     let err = osLastError()
     if int32(err) != ERROR_IO_PENDING:
@@ -654,7 +683,8 @@ proc write*(port: AsyncSerialPort, buff: pointer, len: int32): Future[int32] =
   var retFuture = newFuture[int32]("serialport.write")
 
   if not port.isOpen():
-    retFuture.fail(newException(InvalidSerialPortStateError, "Port must be open in order to write to it"))
+    retFuture.fail(newException(InvalidSerialPortStateError,
+        "Port must be open in order to write to it"))
     return retFuture
 
   var errors: DWORD
@@ -664,7 +694,8 @@ proc write*(port: AsyncSerialPort, buff: pointer, len: int32): Future[int32] =
 
   var ol = PCustomOverlapped()
   GC_ref(ol)
-  ol.data = CompletionData(fd: port.handle, cb: proc(fd: AsyncFD, bytesCount: DWORD, errorCode: OSErrorCode) =
+  ol.data = CompletionData(fd: port.handle, cb: proc(fd: AsyncFD,
+      bytesCount: DWORD, errorCode: OSErrorCode) =
     if not retFuture.finished:
       if errorCode == OSErrorCode(-1):
         retFuture.complete(bytesCount)
@@ -675,7 +706,8 @@ proc write*(port: AsyncSerialPort, buff: pointer, len: int32): Future[int32] =
   ol.offset = DWORD(0)
   ol.offsetHigh = DWORD(0)
 
-  let ret = winlean.writeFile(Handle(port.handle), buff, len, nil, cast[POVERLAPPED](ol))
+  let ret = winlean.writeFile(Handle(port.handle), buff, len, nil, cast[
+      POVERLAPPED](ol))
   if not ret.bool:
     let err = osLastError()
     if err.int32 != ERROR_IO_PENDING:
@@ -720,7 +752,8 @@ proc close*(port: SerialPort | AsyncSerialPort) =
       if EscapeCommFunction(Handle(port.handle), CLRDTR) == 0:
         let lastError = int32(osLastError())
 
-        if lastError in {ERROR_ACCESS_DENIED, ERROR_BAD_COMMAND, ERROR_DEVICE_REMOVED}:
+        if lastError in {ERROR_ACCESS_DENIED, ERROR_BAD_COMMAND,
+            ERROR_DEVICE_REMOVED}:
           skipFlush = true
         else:
           # Unknown error
@@ -735,4 +768,5 @@ proc close*(port: SerialPort | AsyncSerialPort) =
       unregister(port.handle)
 
     discard closeHandle(Handle(port.handle))
-    port.handle = when port is AsyncSerialPort: AsyncFD(InvalidFileHandle) else: InvalidFileHandle
+    port.handle = when port is AsyncSerialPort: AsyncFD(
+        InvalidFileHandle) else: InvalidFileHandle
