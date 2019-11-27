@@ -72,9 +72,6 @@ proc initDcb(port: SerialPort | AsyncSerialPort, baudRate: int32, parity: Parity
     port.dcb.StopBits = TWOSTOPBITS
   of StopBits.OnePointFive:
     port.dcb.StopBits = ONE5STOPBITS
-  #mp035: remove invalid else case
-  #else:
-  #  raise newException(InvalidStopBitsError, "Invalid number of stop bits '" & $stopBits & "'")
 
   port.dcb.Parity = byte(parity)
 
@@ -229,9 +226,6 @@ proc `stopBits=`*(port: SerialPort | AsyncSerialPort, stopBits: StopBits) =
     stopBitsNative = TWOSTOPBITS
   of StopBits.OnePointFive:
     stopBitsNative = ONE5STOPBITS
-  #mp035: remove invalid else case
-  #else:
-  #  raise newException(InvalidStopBitsError, "Invalid number of stop bits '" & $stopBits & "'")
 
   if stopBitsNative != port.dcb.StopBits:
     let oldStopBits = port.dcb.StopBits
