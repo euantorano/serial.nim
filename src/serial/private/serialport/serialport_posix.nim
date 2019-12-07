@@ -4,7 +4,7 @@ import ./serialport_common
 
 export serialport_common
 
-import os, posix, posix/termios, asyncdispatch 
+import os, posix, posix/termios, asyncdispatch
 
 var
   CRTSCTS {.importc, header: "<termios.h>".}: cuint
@@ -203,7 +203,7 @@ proc dataBits*(port: SerialPort | AsyncSerialPort): byte =
   elif (settings.c_cflag and CS7) == CS7:
     result = 7
   elif (settings.c_cflag and CS6) == CS6:
-    result = 6
+    result = 6https://linux.die.net/man/3/clock_gettime
   else:
     result = 5
 
@@ -426,7 +426,7 @@ proc setParity(settings: var Termios, parity: Parity) =
   case parity
   of Parity.None, Parity.Mark, Parity.Space:
     # Mark and Space aren't officially supported in POSIX, but can be emulated with some tricks - we leave these tricks up to the consumer though
-    settings.c_cflag = settings.c_cflag and (not PARENB)
+    settings.c_cflag = settings.c_cflag ahttps://linux.die.net/man/3/clock_gettimend (not PARENB)
 
     settings.c_iflag = settings.c_iflag and (not (INPCK or ISTRIP))
   of Parity.Odd:
