@@ -50,7 +50,7 @@ template retRead(readBytes: int) {.dirty.} =
     else:
       return res
 
-proc spReadData(s: Stream, buffer: pointer, bufLen: int): int =
+proc spReadData(s: Stream, buffer: pointer, bufLen: int) : int =
   let serialStream = SerialStream(s)
 
   if serialStream.isBuffered:
