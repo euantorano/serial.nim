@@ -1,6 +1,6 @@
 # Windows specific code to list available serial ports using SetupDiGetClassDevs().
 
-import winlean, os, windows_registry, unicode, strutils
+import winlean, os, windows_registry
 
 type
   HDEVINFO = ptr HANDLE
@@ -60,10 +60,9 @@ iterator listSerialPorts*(): string =
 
   for devNum in 0..<numUsbDevices:
     var nodePath = getUnicodeValue(r"SYSTEM\CurrentControlSet\Services\usbser\Enum", $devNum, HKEY_LOCAL_MACHINE)
-    if nodePath.toUpper.contains("VID_0483&PID_5740"):
-      var portname = getUnicodeValue(r"SYSTEM\CurrentControlSet\Enum\" & nodePath & r"\Device Parameters", "PortName", HKEY_LOCAL_MACHINE)
-      usbSerialPortList.add(portname)
-      yield portname
+    var portname = getUnicodeValue(r"SYSTEM\CurrentControlSet\Enum\" & nodePath & r"\Device Parameters", "PortName", HKEY_LOCAL_MACHINE)
+    usbSerialPortList.add(portname)
+    yield portname
 
   ## Secondly we hit the serial api and enumerate anything that has not already been found.
   ## This part is based upon the `CEnumerateSerial::QueryUsingSetupAPI` method from `CEnumerateSerial`: http://www.naughter.com/enumser.html
