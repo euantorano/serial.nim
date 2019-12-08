@@ -661,6 +661,13 @@ proc open*(port: AsyncSerialPort, baudRate: int32, parity: Parity, dataBits: byt
   initPort(port, tempHandle, baudRate, parity, dataBits, stopBits, handshaking,
       readTimeout, writeTimeout, dtrEnable, rtsEnable)
 
+proc getPosixMs(): int64 = 
+  var currentTime: Timespec
+  if (clock_gettime(CLOCK_MONOTONIC, currentTime) != 0):
+    raiseOSError(osLastError())
+  result = int64(currentTime.tv_sec) * 1000
+  result += int64(currentTime.tv_nsec) div 1000000'i64
+
 proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
   ## Read up to `len` bytes from the serial port into the buffer `buff`. This will return the actual number of bytes that were received.
   if not port.isOpen():
@@ -671,32 +678,50 @@ proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
       selectSet: TFdSet
       timer: Timeval
       ptrTimer: ptr Timeval
+      endTime: int64
+      timeLeft: int64
 
-    FD_ZERO(selectSet)
-    FD_SET(port.handle, selectSet)
+    timeLeft = port.readTimeout
+    endTime = getPosixMs() + timeLeft
 
-    timer.tv_usec = Suseconds(port.readTimeout * 1000)
+    var totalNumRead = 0;
+    
+    while(totalNumRead < len and timeLeft > 0):
 
-    if port.readTimeout < 0:
-      ptrTimer = nil
-    else:
-      ptrTimer = addr timer
+      FD_ZERO(selectSet)
+      FD_SET(port.handle, selectSet)
 
-    let selected = select(cint(port.handle + 1), addr selectSet, nil, nil, ptrTimer)
+      timer.tv_usec = Suseconds((timeLeft mod 1000) * 1000)
+      timer.tv_sec = Time(timeLeft div 1000)
 
-    case selected
-    of -1:
-      raiseOSError(osLastError())
-    of 0:
-      raise newException(TimeoutError, "Read timed out after " &
-          $port.readTimeout & " seconds")
-    else:
-      let numRead = posix.read(port.handle, buff, int(len))
+      if port.readTimeout < 0:
+        ptrTimer = nil
+      else:
+        ptrTimer = addr timer
 
-      if numRead == -1:
+      let selected = select(cint(port.handle + 1), addr selectSet, nil, nil, ptrTimer)
+
+      case selected
+      of -1:
         raiseOSError(osLastError())
+      of 0:
+        if (totalNumRead == 0):
+          raise newException(TimeoutError, "Read timed out after " &
+              $port.readTimeout & " milliseconds")
+        else:
+          break
+      else:
+        var numRead = posix.read(port.handle, cast[pointer](cast[int](buff)+totalNumRead), int(len-totalNumRead))
 
-      result = int32(numRead)
+        if numRead == -1:
+          raiseOSError(osLastError())
+
+        totalNumRead += numRead
+
+      timeLeft = endTime - getPosixMs()
+          
+    result = int32(totalNumRead)
+
   else:
     let numRead = posix.read(port.handle, buff, int(len))
     if numRead == -1:
@@ -704,7 +729,7 @@ proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
       # no data is available, which is treated as a timeout condition.
       # This means that posix behaves the same as windows. 
       if cint(osLastError()) == EWOULDBLOCK:
-        raise newException(TimeoutError, "Read timed out after 0 seconds")
+        raise newException(TimeoutError, "Read timed out after 0 milliseconds")
       else:
         raiseOSError(osLastError())
 
