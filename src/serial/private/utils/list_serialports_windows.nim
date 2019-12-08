@@ -1,6 +1,6 @@
 # Windows specific code to list available serial ports using SetupDiGetClassDevs().
 
-import winlean, os, registry
+import winlean, os, windows_registry, unicode, strutils
 
 type
   HDEVINFO = ptr HANDLE
@@ -44,10 +44,31 @@ proc SetupDiDestroyDeviceInfoList(DeviceInfoSet: HDEVINFO): bool
 
 iterator listSerialPorts*(): string =
   ## Iterates through a list of serial port names currently available on the system.
-  ##
-  ## This is based upon the `CEnumerateSerial::QueryUsingSetupAPI` method from `CEnumerateSerial`: http://www.naughter.com/enumser.html
 
-  # First create a "device info set" for the device interface GUID
+  
+  ## First we enumerate the USB serial ports from the appropritate registry node, 
+  ## this is because some of them are reported not to show up using the second method below.
+  ## see https://github.com/euantorano/serial.nim/issues/26
+  var usbSerialPortList = newSeq[string]()
+
+  var numUsbDevices = 0
+  try:
+    # the Enum node does not exist if no usb devices have been connected since startup hence the try block
+    numUsbDevices = getDwordValue(r"SYSTEM\CurrentControlSet\Services\usbser\Enum", "Count", HKEY_LOCAL_MACHINE)
+  except OSError:
+    discard #numUsbDevices stays at zero
+
+  for devNum in 0..<numUsbDevices:
+    var nodePath = getUnicodeValue(r"SYSTEM\CurrentControlSet\Services\usbser\Enum", $devNum, HKEY_LOCAL_MACHINE)
+    if nodePath.toUpper.contains("VID_0483&PID_5740"):
+      var portname = getUnicodeValue(r"SYSTEM\CurrentControlSet\Enum\" & nodePath & r"\Device Parameters", "PortName", HKEY_LOCAL_MACHINE)
+      usbSerialPortList.add(portname)
+      yield portname
+
+  ## Secondly we hit the serial api and enumerate anything that has not already been found.
+  ## This part is based upon the `CEnumerateSerial::QueryUsingSetupAPI` method from `CEnumerateSerial`: http://www.naughter.com/enumser.html
+
+  # Create a "device info set" for the device interface GUID
   let devInfoSet = SetupDiGetClassDevs(addr GUID_DEVINTERFACE_COMPORT, nil,
       NULL_HANDLE, setupDiGetClassDevsInitialFlags)
   if devInfoSet[] == -1:
@@ -71,9 +92,12 @@ iterator listSerialPorts*(): string =
 
         if regKey != cast[HKEY](-1):
           # Then read the port name from the registry
-          yield getUnicodeValue("", "PortName", regKey)
+          var portname = getUnicodeValue("", "PortName", regKey)
+          if not usbSerialPortList.contains(portname):
+            yield portname
 
       inc(index)
+
   finally:
     # Destroy the "device info set" once done with it
     if not SetupDiDestroyDeviceInfoList(devInfoSet):
