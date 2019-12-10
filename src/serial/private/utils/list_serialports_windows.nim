@@ -1,6 +1,6 @@
 # Windows specific code to list available serial ports using SetupDiGetClassDevs().
 
-import winlean, os, windows_registry
+import winlean, os, windows_registry, sets
 
 type
   HDEVINFO = ptr HANDLE
@@ -49,7 +49,7 @@ iterator listSerialPorts*(): string =
   ## First we enumerate the USB serial ports from the appropritate registry node, 
   ## this is because some of them are reported not to show up using the second method below.
   ## see https://github.com/euantorano/serial.nim/issues/26
-  var usbSerialPortList = newSeq[string]()
+  var usbSerialPortList HashSet[string]
 
   var numUsbDevices = 0
   try:
@@ -59,9 +59,9 @@ iterator listSerialPorts*(): string =
     discard #numUsbDevices stays at zero
 
   for devNum in 0..<numUsbDevices:
-    var nodePath = getUnicodeValue(r"SYSTEM\CurrentControlSet\Services\usbser\Enum", $devNum, HKEY_LOCAL_MACHINE)
-    var portname = getUnicodeValue(r"SYSTEM\CurrentControlSet\Enum\" & nodePath & r"\Device Parameters", "PortName", HKEY_LOCAL_MACHINE)
-    usbSerialPortList.add(portname)
+    let nodePath = getUnicodeValue(r"SYSTEM\CurrentControlSet\Services\usbser\Enum", $devNum, HKEY_LOCAL_MACHINE)
+    let portname = getUnicodeValue(r"SYSTEM\CurrentControlSet\Enum\" & nodePath & r"\Device Parameters", "PortName", HKEY_LOCAL_MACHINE)
+    usbSerialPortList.incl(portname)
     yield portname
 
   ## Secondly we hit the serial api and enumerate anything that has not already been found.
