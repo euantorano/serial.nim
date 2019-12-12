@@ -43,17 +43,60 @@ proc regGetValue(key: HKEY, lpSubKey, lpValue: WideCString;
                  pcbData: ptr int32): int32 {.
   importc: "RegGetValueW", dynlib: "Advapi32.dll", stdcall.}
 
+proc regQueryInfoKey( hKey: HKEY,
+                       lpClass : WideCstring,
+                       lpcchClass : ptr int32,
+                       lpReserved : ptr int32,
+                       lpcSubKeys : ptr int32,
+                       lpcbMaxSubKeyLen : ptr int32,
+                       lpcbMaxClassLen : ptr int32,
+                       lpcValues : ptr int32,
+                       lpcbMaxValueNameLen : ptr int32,
+                       lpcbMaxValueLen : ptr int32,
+                       lpcbSecurityDescriptor : ptr int32,
+                       lpftLastWriteTime : ptr FILETIME): int32 {.
+  importc: "RegQueryInfoKeyW", dynlib: "Advapi32.dll", stdcall.}
+
+proc regEnumValue( hKey: HKEY,
+                    dwIndex : int32,
+                    lpValueName : WideCString,
+                    lpcchValueName : ptr int32,
+                    lpReserved : ptr int32,
+                    lpType : ptr int32,
+                    lpData : pointer,
+                    lpcbData : ptr int32): int32 {.
+  importc: "RegEnumValueW", dynlib: "Advapi32.dll", stdcall.}
+
 template call(f) =
   let err = f
   if err != 0:
     raiseOSError(err.OSErrorCode, astToStr(f))
 
+iterator enumKeyValues*(path: string, handle: HKEY): tuple[key:string, value:string] =
+  var numValues : int32
+  let hh = newWideCString path
+
+  var newHandle: HKEY
+  call regOpenKeyEx(handle, hh, 0, KEY_READ or KEY_WOW64_64KEY, newHandle)
+  call regQueryInfoKey(newHandle, nil, nil, nil, nil, nil, nil, addr numValues, nil, nil, nil, nil)
+  var regNameSize = 16383'i32
+  var regName = newWideCString("", regNameSize)
+  for i in 0 ..< numValues:
+    var regValueSize = 0'i32
+    call regEnumValue(newHandle, int32(i), regName, addr regNameSize, nil, nil, nil, addr regValueSize)
+    var regValue = newWideCString("", regValueSize)
+    regNameSize += 2 # reallocate for null wchar.
+    call regEnumValue(newHandle, int32(i), regName, addr regNameSize, nil, nil, cast[pointer](regValue), addr regValueSize)
+    yield (regName $ regNameSize, regValue $ regValueSize)
+  
+  call regCloseKey(newHandle)
+
 proc getDwordValue*(path, key: string; handle: HKEY): int32 =
-    let hh = newWideCString path
-    let kk = newWideCString key
-    var buffsize = 4'i32
-    var flags: int32 = RRF_RT_REG_DWORD
-    call regGetValue(handle, hh, kk, flags, nil, addr result, addr buffsize)
+  let hh = newWideCString path
+  let kk = newWideCString key
+  var buffsize = 4'i32
+  var flags: int32 = RRF_RT_REG_DWORD
+  call regGetValue(handle, hh, kk, flags, nil, addr result, addr buffsize)
 
 proc getUnicodeValue*(path, key: string; handle: HKEY): string =
   let hh = newWideCString path
