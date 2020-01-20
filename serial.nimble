@@ -10,6 +10,3 @@ srcDir = "src"
 # Dependencies
 
 requires "nim >= 1.0.0"
-
-task docs, "Build documentation":
-  exec "nim doc --project --index:on -o:docs/ src/serial.nim"

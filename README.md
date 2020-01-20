@@ -18,8 +18,6 @@ Or add the following to your .nimble file:
 requires "serial >= 1.0.0"
 ```
 
-## [API Documentation](https://htmlpreview.github.io/?https://github.com/euantorano/serial.nim/blob/master/docs/serial.html)
-
 ## Usage
 
 There are some examples in the `examples` directory, showing reading from and writing to a serialport.
