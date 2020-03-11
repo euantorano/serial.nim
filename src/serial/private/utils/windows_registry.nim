@@ -79,10 +79,10 @@ iterator enumKeyValues*(path: string, handle: HKEY): tuple[key:string, value:str
   var newHandle: HKEY
   call regOpenKeyEx(handle, hh, 0, KEY_READ or KEY_WOW64_64KEY, newHandle)
   call regQueryInfoKey(newHandle, nil, nil, nil, nil, nil, nil, addr numValues, nil, nil, nil, nil)
-  var regNameSize = 16383'i32
-  var regName = newWideCString("", regNameSize)
   for i in 0 ..< numValues:
     var regValueSize = 0'i32
+    var regNameSize = 16383'i32
+    var regName = newWideCString("", regNameSize)
     call regEnumValue(newHandle, int32(i), regName, addr regNameSize, nil, nil, nil, addr regValueSize)
     var regValue = newWideCString("", regValueSize)
     regNameSize += 2 # reallocate for null wchar.
@@ -129,3 +129,4 @@ proc setUnicodeValue*(path, key, val: string; handle: HKEY) =
   let kk = newWideCString key
   let vv = newWideCString val
   call regSetValue(handle, hh, kk, REG_SZ, vv, (vv.len.int32+1)*2)
+
