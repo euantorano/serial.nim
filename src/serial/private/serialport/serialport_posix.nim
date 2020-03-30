@@ -674,7 +674,7 @@ proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
   if not port.isOpen():
     raise newException(InvalidSerialPortStateError, "Port must be open in order to read from it")
 
-  if port.readTimeout > 0'i32:
+  if port.readTimeout != 0'i32:
     var
       selectSet: TFdSet
       timer: Timeval
@@ -685,19 +685,17 @@ proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
     timeLeft = port.readTimeout
     endTime = getPosixMs() + timeLeft
 
-    var totalNumRead = 0;
-    
-    while(totalNumRead < len and timeLeft > 0):
+    var totalNumRead = 0
 
+    while (totalNumRead < len and (port.readTimeout < 0 or timeLeft > 0)):
       FD_ZERO(selectSet)
       FD_SET(port.handle, selectSet)
-
-      timer.tv_usec = Suseconds((timeLeft mod 1000) * 1000)
-      timer.tv_sec = Time(timeLeft div 1000)
 
       if port.readTimeout < 0:
         ptrTimer = nil
       else:
+        timer.tv_usec = Suseconds((timeLeft mod 1000) * 1000)
+        timer.tv_sec = Time(timeLeft div 1000)
         ptrTimer = addr timer
 
       let selected = select(cint(port.handle + 1), addr selectSet, nil, nil, ptrTimer)
@@ -722,7 +720,6 @@ proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
       timeLeft = endTime - getPosixMs()
           
     result = int32(totalNumRead)
-
   else:
     let numRead = posix.read(port.handle, buff, int(len))
     if numRead == -1:
