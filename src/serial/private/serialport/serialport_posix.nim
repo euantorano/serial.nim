@@ -777,7 +777,6 @@ proc write*(port: SerialPort, buff: pointer, len: int32): int32 =
     else:
       timer.tv_usec = Suseconds((port.writeTimeout mod 1000) * 1000)
       timer.tv_sec = Time(port.writeTimeout div 1000)
-
       ptrTimer = addr timer
 
     let selected = select(cint(port.handle + 1), nil, addr selectSet, nil, ptrTimer)
