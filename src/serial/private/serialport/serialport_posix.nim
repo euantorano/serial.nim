@@ -674,7 +674,7 @@ proc read*(port: SerialPort, buff: pointer, len: int32): int32 =
   if not port.isOpen():
     raise newException(InvalidSerialPortStateError, "Port must be open in order to read from it")
 
-  if port.readTimeout != 0'i32:
+  if port.readTimeout > 0'i32:
     var
       selectSet: TFdSet
       timer: Timeval
@@ -766,7 +766,7 @@ proc write*(port: SerialPort, buff: pointer, len: int32): int32 =
   if not port.isOpen():
     raise newException(InvalidSerialPortStateError, "Port must be open in order to write to it")
 
-  if port.writeTimeout != 0'i32:
+  if port.writeTimeout > 0'i32:
     var
       selectSet: TFdSet
       timer: Timeval
