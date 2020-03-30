@@ -766,7 +766,7 @@ proc write*(port: SerialPort, buff: pointer, len: int32): int32 =
   if not port.isOpen():
     raise newException(InvalidSerialPortStateError, "Port must be open in order to write to it")
 
-  if port.writeTimeout > 0'i32:
+  if port.writeTimeout != 0'i32:
     var
       selectSet: TFdSet
       timer: Timeval
@@ -775,11 +775,12 @@ proc write*(port: SerialPort, buff: pointer, len: int32): int32 =
     FD_ZERO(selectSet)
     FD_SET(port.handle, selectSet)
 
-    timer.tv_usec = Suseconds(port.writeTimeout * 1000)
-
     if port.writeTimeout < 0:
       ptrTimer = nil
     else:
+      timer.tv_usec = Suseconds((port.writeTimeout mod 1000) * 1000)
+      timer.tv_sec = Time(port.writeTimeout div 1000)
+
       ptrTimer = addr timer
 
     let selected = select(cint(port.handle + 1), nil, addr selectSet, nil, ptrTimer)
