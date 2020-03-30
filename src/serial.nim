@@ -89,7 +89,7 @@ when isMainModule:
   var writeBuff = "Hello, World\n"
   let numWritten = port.write(addr writeBuff[0], int32(len(writeBuff)))
 
-  echo "Wrote ", numWritten, " bytes: ", writeBuff[0..numWritten]
+  echo "Wrote ", numWritten, " bytes: ", writeBuff[0..numWritten-1]
 
   var buff: string = newString(1024)
   let numRead = port.read(addr buff[0], int32(len(buff)))
