@@ -26,12 +26,16 @@ when isMainModule:
       except:
         writeLine(stderr, "[ERROR] Invalid port")
 
-    let serialPort = newSerialStream(portName, 9600, Parity.None, 8, StopBits.One, Handshake.None, buffered=true)
+    let serialPort = newSerialStream(portName, 9600, Parity.None, 8, StopBits.One, Handshake.None, buffered=false)
     defer: close(serialPort)
+
+    serialPort.setTimeouts(5000, 500)
 
     echo "Opened serial port '", portName, "', receiving"
 
     while true:
-      echo "Received: ", serialPort.readLine()
+      let ln = serialPort.readLine()
+
+      echo "Received: '", ln, "'"
 
   main()

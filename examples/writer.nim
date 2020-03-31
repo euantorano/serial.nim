@@ -29,6 +29,8 @@ when isMainModule:
     let serialPort = newSerialStream(portName, 9600, Parity.None, 8, StopBits.One, Handshake.None, buffered=true)
     defer: close(serialPort)
 
+    serialPort.setTimeouts(5000, 500)
+
     echo "Opened serial port '", portName, "', ready to send"
 
     var toSend: string
