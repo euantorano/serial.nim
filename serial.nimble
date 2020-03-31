@@ -1,6 +1,6 @@
 # Package
 
-version       = "1.1.3"
+version       = "1.1.4"
 author        = "Euan T"
 description   = "SerialPort library for Nim."
 license       = "BSD-3-Clause"
