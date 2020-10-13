@@ -634,8 +634,12 @@ proc read*(port: AsyncSerialPort, buff: pointer, len: int32): Future[int32] =
     retFuture.fail(newException(OSError, osErrorMsg(osLastError())))
     return retFuture
 
-  var ol = PCustomOverlapped()
-  GC_ref(ol)
+  when declared(PCustomOverlapped):
+    var ol = PCustomOverlapped()
+    GC_ref(ol)
+  else:
+    var ol = asyncdispatch.newCustom()
+
   ol.data = CompletionData(fd: port.handle, cb: proc(fd: AsyncFD,
       bytesCount: DWORD, errorCode: OSErrorCode) =
     if not retFuture.finished:
@@ -692,8 +696,12 @@ proc write*(port: AsyncSerialPort, buff: pointer, len: int32): Future[int32] =
     retFuture.fail(newException(OSError, osErrorMsg(osLastError())))
     return retFuture
 
-  var ol = PCustomOverlapped()
-  GC_ref(ol)
+  when declared(PCustomOverlapped):
+    var ol = PCustomOverlapped()
+    GC_ref(ol)
+  else:
+    var ol = asyncdispatch.newCustom()
+
   ol.data = CompletionData(fd: port.handle, cb: proc(fd: AsyncFD,
       bytesCount: DWORD, errorCode: OSErrorCode) =
     if not retFuture.finished:
