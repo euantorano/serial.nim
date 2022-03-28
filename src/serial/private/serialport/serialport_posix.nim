@@ -594,9 +594,9 @@ proc initPort(port: SerialPort | AsyncSerialPort, tempHandle: cint, baudRate: in
     setSpeed(addr settings, baudRate)
 
     settings.c_cflag = settings.c_cflag or (CLOCAL or CREAD)
-    settings.c_lflag = settings.c_lflag and (not (ICANON or ECHO or ECHOE or ISIG))
-    settings.c_oflag = settings.c_oflag and (not OPOST)
-    settings.c_iflag = settings.c_iflag and (not (INLCR or IGNCR or ICRNL))
+    settings.c_lflag = settings.c_lflag and (not (ICANON or ECHO or ECHOE or ECHOK or ECHONL or ISIG or IEXTEN))
+    settings.c_oflag = settings.c_oflag and (not (OPOST or ONLCR or OCRNL))
+    settings.c_iflag = settings.c_iflag and (not (INLCR or IGNCR or ICRNL or IGNBRK or PARMRK))
 
     setParity(settings, parity)
     setDataBits(settings, dataBits)
@@ -637,7 +637,9 @@ proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, st
   if port.isOpen():
     raise newException(InvalidSerialPortStateError, "Serial port is already open.")
 
-  let tempHandle = posix.open(port.name, O_RDWR or O_NOCTTY or O_NONBLOCK)
+  let portName = cstring(port.name)
+
+  let tempHandle = posix.open(portName, O_RDWR or O_NOCTTY or O_NONBLOCK)
   if tempHandle == -1:
     raiseOSError(osLastError())
 
@@ -655,7 +657,9 @@ proc open*(port: AsyncSerialPort, baudRate: int32, parity: Parity, dataBits: byt
   if port.isOpen():
     raise newException(InvalidSerialPortStateError, "Serial port is already open.")
 
-  let tempHandle = posix.open(port.name, O_RDWR or O_NOCTTY)
+  let portName = cstring(port.name)
+
+  let tempHandle = posix.open(portName, O_RDWR or O_NOCTTY)
   if tempHandle == -1:
     raiseOSError(osLastError())
 
@@ -834,7 +838,7 @@ proc flush*(port: SerialPort | AsyncSerialPort) =
   if not port.isOpen():
     raise newException(InvalidSerialPortStateError, "Port must be open in order to be flushed")
 
-  if tcflush(cint(port.handle), TCIOFLUSH) == -1:
+  if tcdrain(cint(port.handle)) == -1:
     raiseOSError(osLastError())
 
 proc close*(port: SerialPort | AsyncSerialPort) =
