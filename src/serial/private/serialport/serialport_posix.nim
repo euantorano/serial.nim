@@ -834,7 +834,7 @@ proc flush*(port: SerialPort | AsyncSerialPort) =
   if not port.isOpen():
     raise newException(InvalidSerialPortStateError, "Port must be open in order to be flushed")
 
-  if tcflush(cint(port.handle), TCIOFLUSH) == -1:
+  if tcdrain(cint(port.handle)) == -1:
     raiseOSError(osLastError())
 
 proc close*(port: SerialPort | AsyncSerialPort) =
