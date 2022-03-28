@@ -637,7 +637,9 @@ proc open*(port: SerialPort, baudRate: int32, parity: Parity, dataBits: byte, st
   if port.isOpen():
     raise newException(InvalidSerialPortStateError, "Serial port is already open.")
 
-  let tempHandle = posix.open(port.name, O_RDWR or O_NOCTTY or O_NONBLOCK)
+  let portName = cstring(port.name)
+
+  let tempHandle = posix.open(portName, O_RDWR or O_NOCTTY or O_NONBLOCK)
   if tempHandle == -1:
     raiseOSError(osLastError())
 
@@ -655,7 +657,9 @@ proc open*(port: AsyncSerialPort, baudRate: int32, parity: Parity, dataBits: byt
   if port.isOpen():
     raise newException(InvalidSerialPortStateError, "Serial port is already open.")
 
-  let tempHandle = posix.open(port.name, O_RDWR or O_NOCTTY)
+  let portName = cstring(port.name)
+
+  let tempHandle = posix.open(portName, O_RDWR or O_NOCTTY)
   if tempHandle == -1:
     raiseOSError(osLastError())
 
