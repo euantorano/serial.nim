@@ -594,9 +594,9 @@ proc initPort(port: SerialPort | AsyncSerialPort, tempHandle: cint, baudRate: in
     setSpeed(addr settings, baudRate)
 
     settings.c_cflag = settings.c_cflag or (CLOCAL or CREAD)
-    settings.c_lflag = settings.c_lflag and (not (ICANON or ECHO or ECHOE or ISIG))
-    settings.c_oflag = settings.c_oflag and (not OPOST)
-    settings.c_iflag = settings.c_iflag and (not (INLCR or IGNCR or ICRNL))
+    settings.c_lflag = settings.c_lflag and (not (ICANON or ECHO or ECHOE or ECHOK or ECHONL or ISIG or IEXTEN))
+    settings.c_oflag = settings.c_oflag and (not (OPOST or ONLCR or OCRNL))
+    settings.c_iflag = settings.c_iflag and (not (INLCR or IGNCR or ICRNL or IGNBRK or IUCLC or PARMRK))
 
     setParity(settings, parity)
     setDataBits(settings, dataBits)
