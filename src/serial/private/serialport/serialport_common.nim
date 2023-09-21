@@ -27,17 +27,17 @@ type
     Two = 2,
     OnePointFive = 3
 
-  InvalidSerialPortError* = object of Exception
+  InvalidSerialPortError* = object of IOError
 
   TimeoutError* = object of IOError
 
   InvalidSerialPortStateError* = object of IOError
 
-  InvalidBaudRateError* = object of Exception
+  InvalidBaudRateError* = object of ValueError
 
-  InvalidDataBitsError* = object of Exception
+  InvalidDataBitsError* = object of ValueError
 
-  InvalidStopBitsError* = object of Exception
+  InvalidStopBitsError* = object of IOError
 
   ReceivedError* {.pure.} = enum
     ## Types of error detected by the operating system whilst reading from/writing to a serial port.
