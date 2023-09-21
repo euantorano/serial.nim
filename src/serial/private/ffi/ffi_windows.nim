@@ -224,13 +224,7 @@ proc ClearCommError*(hFile: Handle, lpErrors: ptr DWORD,
     lpStat: ptr ComStat): WINBOOL {.stdcall, dynlib: "kernel32",
     importc: "ClearCommError".}
 
-when useWinUnicode:
-  const CreateFileWindows* = createFileW
-else:
-  const CreateFileWindows* = createFileA
+const CreateFileWindows* = createFileW
 
 template getWindowsString*(str: string): untyped =
-  when useWinUnicode:
-    newWideCString(str)
-  else:
-    cstring(str)
+  newWideCString(str)

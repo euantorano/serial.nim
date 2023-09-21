@@ -760,8 +760,8 @@ proc close*(port: SerialPort | AsyncSerialPort) =
       if EscapeCommFunction(Handle(port.handle), CLRDTR) == 0:
         let lastError = int32(osLastError())
 
-        if lastError in {ERROR_ACCESS_DENIED, ERROR_BAD_COMMAND,
-            ERROR_DEVICE_REMOVED}:
+        if lastError in [ERROR_ACCESS_DENIED, ERROR_BAD_COMMAND,
+            ERROR_DEVICE_REMOVED]:
           skipFlush = true
         else:
           # Unknown error
