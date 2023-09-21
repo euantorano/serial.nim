@@ -37,7 +37,7 @@ type
 
   InvalidDataBitsError* = object of ValueError
 
-  InvalidStopBitsError* = object of IOError
+  InvalidStopBitsError* = object of ValueError
 
   ReceivedError* {.pure.} = enum
     ## Types of error detected by the operating system whilst reading from/writing to a serial port.
