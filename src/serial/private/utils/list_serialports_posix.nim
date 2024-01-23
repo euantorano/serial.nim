@@ -11,6 +11,9 @@ elif defined(freebsd):
 elif defined(netbsd):
   const supportedPlatform = true
   const serialDevicesPattern = "/dev/dty*"
+elif defined(nuttx):
+  const supportedPlatform = true
+  const serialDevicesPattern = "/dev/tty*"
 else:
   const supportedPlatform = false
   {.warning: "Unknown platform, listing serial ports is not supported.".}

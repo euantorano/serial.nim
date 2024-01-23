@@ -2,7 +2,7 @@
 
 when defined(windows):
   include ./private/serialport/serialport_windows
-elif defined(posix):
+elif defined(posix) or defined(nuttx):
   include ./private/serialport/serialport_posix
 else:
   {.error: "Serial port handling not implemented for your platform".}

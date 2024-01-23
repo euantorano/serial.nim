@@ -7,7 +7,7 @@ elif defined(macosx):
   include ./private/utils/list_serialports_mac
 elif defined(linux):
   include ./private/utils/list_serialports_linux
-elif defined(posix):
+elif defined(posix) or defined(nuttx):
   include ./private/utils/list_serialports_posix
 else:
   {.warning: "Unknown platform, listing serial ports is not supported.".}
